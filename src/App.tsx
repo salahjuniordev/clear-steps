@@ -7,6 +7,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import Index from "./pages/Index.tsx";
 import Maladies from "./pages/Maladies.tsx";
+import MaladieDetail from "./pages/MaladieDetail.tsx";
 import Quiz from "./pages/Quiz.tsx";
 import Annuaire from "./pages/Annuaire.tsx";
 import Chat from "./pages/Chat.tsx";
@@ -23,10 +24,12 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <a href="#main" className="skip-link">Aller au contenu principal</a>
         <Navbar />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/maladies" element={<Maladies />} />
+          <Route path="/maladie/:slug" element={<MaladieDetail />} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/annuaire" element={<Annuaire />} />
           <Route path="/chat" element={<Chat />} />
