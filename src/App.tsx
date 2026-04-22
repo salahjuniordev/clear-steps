@@ -12,6 +12,7 @@ import Quiz from "./pages/Quiz.tsx";
 import Annuaire from "./pages/Annuaire.tsx";
 import Chat from "./pages/Chat.tsx";
 import Blog from "./pages/Blog.tsx";
+import BlogArticle from "./pages/BlogArticle.tsx";
 import APropos from "./pages/APropos.tsx";
 import Contact from "./pages/Contact.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/annuaire" element={<Annuaire />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogArticle />} />
           <Route path="/a-propos" element={<APropos />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
