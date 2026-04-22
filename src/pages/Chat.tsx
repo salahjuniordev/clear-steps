@@ -2,9 +2,31 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowLeft, Send, Sparkles, MessageCircle, AlertTriangle, Loader2, Trash2 } from "lucide-react";
+import jsPDF from "jspdf";
+import {
+  ArrowLeft,
+  Send,
+  Sparkles,
+  MessageCircle,
+  AlertTriangle,
+  Loader2,
+  Trash2,
+  Mic,
+  MicOff,
+  Square,
+  Pencil,
+  Download,
+  FileText,
+  FileDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -18,6 +40,23 @@ const suggestions = [
   "Que faire en cas de forte fièvre chez un enfant ?",
   "Différence entre typhoïde et paludisme ?",
 ];
+
+// Web Speech API typings (browser-provided)
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: ((e: any) => void) | null;
+  onerror: ((e: any) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
+const getSpeechRecognition = (): (new () => SpeechRecognitionLike) | null => {
+  if (typeof window === "undefined") return null;
+  return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null;
+};
 
 const Welcome = ({ onPick }: { onPick: (s: string) => void }) => (
   <div className="text-center max-w-2xl mx-auto py-10">
@@ -55,8 +94,12 @@ const Chat = () => {
   });
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const interimBaseRef = useRef<string>("");
 
   useEffect(() => {
     document.title = "Chatbot santé AI · AfyaPulse";
@@ -64,12 +107,19 @@ const Chat = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  const send = async (text: string) => {
+  useEffect(() => () => {
+    abortRef.current?.abort();
+    recognitionRef.current?.stop();
+  }, []);
+
+  /** Send a message. If `historyOverride` is provided, replaces conversation history before sending. */
+  const send = async (text: string, historyOverride?: Msg[]) => {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
+    const baseHistory = historyOverride ?? messages;
     const userMsg: Msg = { role: "user", content: trimmed };
-    const next = [...messages, userMsg];
+    const next = [...baseHistory, userMsg];
     setMessages(next);
     setInput("");
     setIsLoading(true);
@@ -173,6 +223,192 @@ const Chat = () => {
     localStorage.removeItem(STORAGE_KEY);
   };
 
+  /** Stop streaming response — keeps whatever has been received so far. */
+  const stopStreaming = () => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setIsLoading(false);
+    toast({ title: "Réponse interrompue", description: "Le texte partiel a été conservé." });
+  };
+
+  /** Edit & resend last user message: removes last user + assistant pair, refills input. */
+  const editLastUser = () => {
+    if (isLoading) {
+      toast({ title: "Patiente", description: "Attends la fin de la réponse ou clique sur Stop." });
+      return;
+    }
+    let lastUserIdx = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === "user") { lastUserIdx = i; break; }
+    }
+    if (lastUserIdx === -1) return;
+    const lastUserContent = messages[lastUserIdx].content;
+    setMessages(messages.slice(0, lastUserIdx));
+    setInput(lastUserContent);
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+      inputRef.current?.setSelectionRange(lastUserContent.length, lastUserContent.length);
+    });
+  };
+
+  /** Toggle voice dictation using the browser's free Web Speech API (FR-FR). */
+  const toggleMic = () => {
+    const SR = getSpeechRecognition();
+    if (!SR) {
+      toast({
+        title: "Dictée non supportée",
+        description: "Ton navigateur ne supporte pas la reconnaissance vocale. Essaie Chrome ou Edge.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    try {
+      const recognition = new SR();
+      recognition.lang = "fr-FR";
+      recognition.interimResults = true;
+      recognition.continuous = true;
+      interimBaseRef.current = input ? input.trimEnd() + " " : "";
+
+      recognition.onresult = (event: any) => {
+        let finalText = "";
+        let interimText = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) finalText += transcript;
+          else interimText += transcript;
+        }
+        if (finalText) {
+          interimBaseRef.current = (interimBaseRef.current + finalText).replace(/\s+/g, " ");
+        }
+        setInput((interimBaseRef.current + interimText).trimStart());
+      };
+      recognition.onerror = (e: any) => {
+        console.error("Speech recognition error", e);
+        if (e?.error === "not-allowed") {
+          toast({ title: "Microphone bloqué", description: "Autorise l'accès au micro dans ton navigateur.", variant: "destructive" });
+        } else if (e?.error !== "aborted" && e?.error !== "no-speech") {
+          toast({ title: "Erreur de dictée", description: e?.error ?? "Réessaie.", variant: "destructive" });
+        }
+      };
+      recognition.onend = () => {
+        setIsListening(false);
+        recognitionRef.current = null;
+      };
+      recognitionRef.current = recognition;
+      recognition.start();
+      setIsListening(true);
+      inputRef.current?.focus();
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Impossible de démarrer la dictée", variant: "destructive" });
+    }
+  };
+
+  /** Export conversation as TXT or PDF. */
+  const buildPlainText = () => {
+    const date = new Date().toLocaleString("fr-FR");
+    const header = `AfyaPulse — Conversation avec l'assistant santé\n${date}\n${"=".repeat(60)}\n\n`;
+    const body = messages
+      .map((m) => `${m.role === "user" ? "Toi" : "Assistant"} :\n${m.content}\n`)
+      .join("\n" + "-".repeat(40) + "\n\n");
+    const footer = `\n\n${"=".repeat(60)}\nRappel : ces informations ne remplacent pas un avis médical.\nUrgences SAMU Cameroun : 15 / 999\n`;
+    return header + body + footer;
+  };
+
+  const exportTxt = () => {
+    if (messages.length === 0) {
+      toast({ title: "Conversation vide", description: "Pose une question avant d'exporter." });
+      return;
+    }
+    const blob = new Blob([buildPlainText()], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `afyapulse-conversation-${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportPdf = () => {
+    if (messages.length === 0) {
+      toast({ title: "Conversation vide", description: "Pose une question avant d'exporter." });
+      return;
+    }
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const margin = 48;
+    const maxW = pageW - margin * 2;
+    let y = margin;
+
+    const ensureSpace = (need: number) => {
+      if (y + need > pageH - margin) {
+        doc.addPage();
+        y = margin;
+      }
+    };
+
+    // Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(13, 87, 64);
+    doc.text("AfyaPulse — Conversation santé", margin, y);
+    y += 22;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(new Date().toLocaleString("fr-FR"), margin, y);
+    y += 18;
+    doc.setDrawColor(220);
+    doc.line(margin, y, pageW - margin, y);
+    y += 18;
+
+    // Messages
+    messages.forEach((m) => {
+      const isUser = m.role === "user";
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(isUser ? 13 : 26, isUser ? 87 : 110, isUser ? 64 : 122);
+      ensureSpace(18);
+      doc.text(isUser ? "Toi" : "Assistant AfyaPulse", margin, y);
+      y += 14;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.setTextColor(30);
+      const lines = doc.splitTextToSize(m.content || "", maxW);
+      lines.forEach((line: string) => {
+        ensureSpace(14);
+        doc.text(line, margin, y);
+        y += 14;
+      });
+      y += 10;
+    });
+
+    // Footer disclaimer
+    ensureSpace(40);
+    doc.setDrawColor(220);
+    doc.line(margin, y, pageW - margin, y);
+    y += 14;
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9);
+    doc.setTextColor(120);
+    doc.text(
+      "Ces informations ne remplacent pas un avis médical. Urgences SAMU Cameroun : 15 / 999.",
+      margin,
+      y,
+      { maxWidth: maxW },
+    );
+
+    doc.save(`afyapulse-conversation-${Date.now()}.pdf`);
+  };
+
+  const hasUserMsg = messages.some((m) => m.role === "user");
+
   return (
     <main id="main" className="min-h-screen bg-hero">
       <div className="container-tight py-10 sm:py-14">
@@ -180,11 +416,30 @@ const Chat = () => {
           <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/60 hover:text-primary transition-smooth">
             <ArrowLeft className="h-4 w-4" /> Retour à l'accueil
           </Link>
-          {messages.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={clear} aria-label="Effacer la conversation">
-              <Trash2 className="h-4 w-4" /> Nouvelle conversation
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {messages.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" aria-label="Exporter la conversation">
+                    <Download className="h-4 w-4" /> Exporter
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={exportPdf}>
+                    <FileDown className="h-4 w-4 mr-2" /> PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportTxt}>
+                    <FileText className="h-4 w-4 mr-2" /> TXT
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {messages.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={clear} aria-label="Effacer la conversation">
+                <Trash2 className="h-4 w-4" /> Nouvelle conversation
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="mt-6 max-w-3xl mx-auto">
@@ -217,10 +472,7 @@ const Chat = () => {
             ) : (
               <ul className="space-y-5">
                 {messages.map((m, i) => (
-                  <li
-                    key={i}
-                    className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
+                  <li key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div
                       className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                         m.role === "user"
@@ -249,34 +501,84 @@ const Chat = () => {
             )}
           </div>
 
+          {/* Action row above composer */}
+          {hasUserMsg && (
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={editLastUser}
+                disabled={isLoading}
+                aria-label="Modifier et renvoyer le dernier message"
+              >
+                <Pencil className="h-3.5 w-3.5" /> Modifier le dernier message
+              </Button>
+            </div>
+          )}
+
           {/* Composer */}
-          <form onSubmit={handleSubmit} className="mt-5">
+          <form onSubmit={handleSubmit} className="mt-3">
             <label htmlFor="chat-input" className="sr-only">Pose ta question santé</label>
-            <div className="flex gap-2 items-end rounded-2xl bg-card ring-1 ring-border p-2 shadow-soft focus-within:ring-primary transition-smooth">
+            <div
+              className={`flex gap-2 items-end rounded-2xl bg-card ring-1 p-2 shadow-soft transition-smooth ${
+                isListening ? "ring-warning" : "ring-border focus-within:ring-primary"
+              }`}
+            >
               <Textarea
                 id="chat-input"
+                ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKey}
-                placeholder="Décris tes symptômes ou pose une question santé…"
+                placeholder={isListening ? "🎙️ Parle, je t'écoute…" : "Décris tes symptômes ou pose une question santé…"}
                 rows={1}
                 className="flex-1 border-0 bg-transparent resize-none min-h-[44px] max-h-40 focus-visible:ring-0 focus-visible:ring-offset-0"
-                disabled={isLoading}
                 aria-label="Message à l'assistant"
               />
+
+              {/* Mic button */}
               <Button
-                type="submit"
-                variant="hero"
+                type="button"
+                variant={isListening ? "destructive" : "soft"}
                 size="icon"
-                disabled={isLoading || !input.trim()}
-                aria-label="Envoyer le message"
-                className="h-11 w-11 shrink-0"
+                onClick={toggleMic}
+                aria-label={isListening ? "Arrêter la dictée vocale" : "Dicter ma question au micro"}
+                aria-pressed={isListening}
+                className={`h-11 w-11 shrink-0 ${isListening ? "animate-pulse" : ""}`}
+                title={isListening ? "Arrêter la dictée" : "Dicter au micro"}
               >
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </Button>
+
+              {/* Send / Stop button */}
+              {isLoading ? (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  onClick={stopStreaming}
+                  aria-label="Arrêter la réponse en cours"
+                  className="h-11 w-11 shrink-0"
+                  title="Stop"
+                >
+                  <Square className="h-4 w-4 fill-current" />
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  variant="hero"
+                  size="icon"
+                  disabled={!input.trim()}
+                  aria-label="Envoyer le message"
+                  className="h-11 w-11 shrink-0"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              )}
             </div>
             <p className="mt-2 text-xs text-foreground/50 text-center">
-              Entrée pour envoyer · Maj+Entrée pour saut de ligne
+              Entrée pour envoyer · Maj+Entrée pour saut de ligne · 🎙️ Micro pour dicter
             </p>
           </form>
         </div>
