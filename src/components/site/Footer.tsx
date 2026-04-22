@@ -41,7 +41,7 @@ export const Footer = () => (
     </div>
     <div className="border-t border-primary-foreground/10">
       <div className="container-tight py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-primary-foreground/60">
-        <p>© 2025 AfyaPulse · Tous droits réservés</p>
+        <p>© 2026 AfyaPulse · Tous droits réservés</p>
         <p>
           Build By{" "}
           <a
