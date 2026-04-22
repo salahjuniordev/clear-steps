@@ -42,7 +42,17 @@ export const Footer = () => (
     <div className="border-t border-primary-foreground/10">
       <div className="container-tight py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-primary-foreground/60">
         <p>© 2025 AfyaPulse · Tous droits réservés</p>
-        <p>Préparé par XEON-CORE × Hands On Pixels</p>
+        <p>
+          Build By{" "}
+          <a
+            href="https://salahjuniordev.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-primary-foreground hover:text-primary-foreground/80 underline-offset-4 hover:underline transition-smooth"
+          >
+            Salah Junior Dev
+          </a>
+        </p>
       </div>
     </div>
   </footer>
