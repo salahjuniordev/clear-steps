@@ -1,14 +1,74 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, MessageCircle, Sparkles, ShieldCheck, Search, Stethoscope, MapPin, Bell } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight, MessageCircle, Sparkles, ShieldCheck, Search, Stethoscope, MapPin, Bell, HeartPulse, Globe2, Users, BookOpen, Quote, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/hero-afyapulse.jpg";
 
-const stats = [
-  { value: "25+", label: "Maladies documentées" },
-  { value: "200+", label: "Cliniques référencées" },
-  { value: "10", label: "Régions couvertes" },
-  { value: "24/7", label: "Assistant AI" },
+const counters = [
+  { value: 25, suffix: "+", label: "Maladies documentées", icon: BookOpen },
+  { value: 200, suffix: "+", label: "Cliniques référencées", icon: MapPin },
+  { value: 10, suffix: "", label: "Régions couvertes", icon: Globe2 },
+  { value: 50000, suffix: "+", label: "Utilisateurs informés", icon: Users },
 ];
+
+const whyChoose = [
+  { icon: ShieldCheck, title: "Information vérifiée", desc: "Toutes nos fiches sont basées sur des sources officielles : OMS, MSAS et Africa CDC." },
+  { icon: Globe2, title: "Pensé pour l'Afrique", desc: "Contenu localisé en français, adapté aux réalités sanitaires camerounaises et sub-sahariennes." },
+  { icon: HeartPulse, title: "Assistance 24/7", desc: "Un assistant IA bilingue FR/EN disponible à tout moment pour répondre à vos questions santé." },
+  { icon: MapPin, title: "Réseau de proximité", desc: "Plus de 200 structures de santé géolocalisées avec itinéraires et appel direct en un clic." },
+  { icon: Sparkles, title: "Quiz personnalisé", desc: "Évaluation rapide en 2 minutes pour une orientation médicale adaptée à votre profil." },
+  { icon: Bell, title: "Alertes épidémiques", desc: "Soyez prévenu en temps réel des risques sanitaires dans votre région." },
+];
+
+const testimonials = [
+  { name: "Aïcha N.", role: "Mère de famille · Douala", text: "AfyaPulse m'a aidée à comprendre les symptômes du paludisme chez mon fils. Le quiz m'a orientée vers la bonne clinique.", rating: 5 },
+  { name: "Dr. Etienne M.", role: "Médecin généraliste · Yaoundé", text: "Une plateforme indispensable. Je la recommande à mes patients pour qu'ils s'informent avant la consultation.", rating: 5 },
+  { name: "Samuel K.", role: "Étudiant · Bafoussam", text: "L'assistant IA m'a sauvé pendant un épisode de typhoïde. Réponses claires et orientation rapide vers les urgences.", rating: 5 },
+];
+
+function useCountUp(target: number, duration = 2000) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const tick = (now: number) => {
+            const p = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 3);
+            setValue(Math.round(target * eased));
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      });
+    }, { threshold: 0.3 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [target, duration]);
+  return { value, ref };
+}
+
+const Counter = ({ target, suffix, label, Icon }: { target: number; suffix: string; label: string; Icon: typeof BookOpen }) => {
+  const { value, ref } = useCountUp(target);
+  const display = value >= 1000 ? `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}k` : value.toString();
+  return (
+    <div ref={ref} className="text-center sm:text-left">
+      <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-foreground/10 text-primary-foreground mb-3">
+        <Icon className="h-5 w-5" />
+      </span>
+      <div className="font-mono text-3xl sm:text-4xl font-bold text-primary-foreground tabular-nums">
+        {display}{suffix}
+      </div>
+      <div className="mt-1 text-sm text-primary-foreground/70">{label}</div>
+    </div>
+  );
+};
 
 const featured = [
   { name: "Paludisme", category: "Infectieuse", color: "bg-warning/10 text-warning ring-warning/20", desc: "Première cause de mortalité infantile en Afrique." },
