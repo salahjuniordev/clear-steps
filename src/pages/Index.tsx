@@ -147,15 +147,76 @@ const Index = () => {
         </div>
       </section>
 
-      {/* STATS */}
-      <section className="container-tight -mt-6 sm:-mt-10 relative z-10">
-        <div className="rounded-3xl bg-stats text-primary-foreground shadow-elevated p-8 sm:p-10 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center sm:text-left">
-              <div className="font-mono text-3xl sm:text-4xl font-bold text-primary-foreground">{s.value}</div>
-              <div className="mt-1 text-sm text-primary-foreground/70">{s.label}</div>
+      {/* COUNTERS */}
+      <section className="container-tight -mt-6 sm:-mt-10 relative z-10" aria-label="Chiffres clés AfyaPulse">
+        <div className="rounded-3xl bg-stats text-primary-foreground shadow-elevated p-8 sm:p-10 grid grid-cols-2 md:grid-cols-4 gap-8">
+          {counters.map((c) => (
+            <Counter key={c.label} target={c.value} suffix={c.suffix} label={c.label} Icon={c.icon} />
+          ))}
+        </div>
+      </section>
+
+      {/* WHY CHOOSE US */}
+      <section className="container-tight py-20 sm:py-24">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">Pourquoi AfyaPulse</p>
+          <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-primary">
+            La santé africaine, enfin accessible.
+          </h2>
+          <p className="mt-3 text-foreground/70">
+            Une plateforme conçue par et pour les communautés d'Afrique francophone.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {whyChoose.map((item) => (
+            <div
+              key={item.title}
+              className="group rounded-2xl bg-card ring-1 ring-border p-6 shadow-soft hover:shadow-elevated hover:-translate-y-1 transition-smooth"
+            >
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary group-hover:bg-primary-gradient group-hover:text-primary-foreground transition-smooth">
+                <item.icon className="h-6 w-6" />
+              </span>
+              <h3 className="mt-5 text-lg font-semibold text-primary">{item.title}</h3>
+              <p className="mt-2 text-sm text-foreground/70 leading-relaxed">{item.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="bg-secondary/40 border-y border-border">
+        <div className="container-tight py-20">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">Témoignages</p>
+            <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-primary">
+              Ils nous font confiance
+            </h2>
+            <p className="mt-3 text-foreground/70">
+              Des milliers de familles, soignants et étudiants utilisent AfyaPulse au quotidien.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((t) => (
+              <figure
+                key={t.name}
+                className="relative rounded-2xl bg-card ring-1 ring-border p-7 shadow-soft hover:shadow-elevated transition-smooth"
+              >
+                <Quote className="absolute -top-3 left-6 h-7 w-7 text-primary-glow bg-card rounded-full p-1 ring-1 ring-border" aria-hidden />
+                <div className="flex gap-0.5 mb-4" aria-label={`Note ${t.rating} sur 5`}>
+                  {Array.from({ length: t.rating }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-warning text-warning" />
+                  ))}
+                </div>
+                <blockquote className="text-sm text-foreground/80 leading-relaxed">
+                  « {t.text} »
+                </blockquote>
+                <figcaption className="mt-5 pt-5 border-t border-border">
+                  <div className="text-sm font-semibold text-primary">{t.name}</div>
+                  <div className="text-xs text-foreground/60">{t.role}</div>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
         </div>
       </section>
 
