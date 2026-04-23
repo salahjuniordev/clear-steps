@@ -1,20 +1,21 @@
 import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
-import { Activity, Menu, X } from "lucide-react";
+import { Activity, Menu, X, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const links = [
-  { to: "/maladies", label: "Maladies" },
-  { to: "/quiz", label: "Quiz" },
-  { to: "/annuaire", label: "Annuaire" },
-  { to: "/blog", label: "Blog" },
-  { to: "/a-propos", label: "À propos" },
-  { to: "/contact", label: "Contact" },
-];
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [lang, setLang] = useState<"FR" | "EN">("FR");
+  const { lang, toggle, t } = useLanguage();
+
+  const links = [
+    { to: "/maladies", label: t("nav.maladies") },
+    { to: "/quiz", label: t("nav.quiz") },
+    { to: "/annuaire", label: t("nav.annuaire") },
+    { to: "/blog", label: t("nav.blog") },
+    { to: "/a-propos", label: t("nav.about") },
+    { to: "/contact", label: t("nav.contact") },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -49,21 +50,23 @@ export const Navbar = () => {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setLang(lang === "FR" ? "EN" : "FR")}
-            className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-full border border-border text-foreground/70 hover:text-primary hover:border-primary transition-smooth"
-            aria-label="Toggle language"
+            onClick={toggle}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border border-border text-foreground/70 hover:text-primary hover:border-primary transition-smooth"
+            aria-label={t("nav.langToggle")}
+            title={t("nav.langToggle")}
           >
+            <Languages className="h-3.5 w-3.5" />
             <span className={lang === "FR" ? "text-primary" : ""}>FR</span>
             <span className="text-border">·</span>
             <span className={lang === "EN" ? "text-primary" : ""}>EN</span>
           </button>
           <Button asChild variant="hero" size="sm" className="hidden sm:inline-flex">
-            <Link to="/chat">Chatbot AI</Link>
+            <Link to="/chat">{t("nav.chat")}</Link>
           </Button>
           <button
             className="lg:hidden p-2 -mr-2 text-foreground"
             onClick={() => setOpen(!open)}
-            aria-label="Menu"
+            aria-label={t("nav.menu")}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -90,7 +93,7 @@ export const Navbar = () => {
             ))}
             <li className="pt-2">
               <Button asChild variant="hero" className="w-full">
-                <Link to="/chat" onClick={() => setOpen(false)}>Parler au Chatbot AI</Link>
+                <Link to="/chat" onClick={() => setOpen(false)}>{t("nav.chatMobile")}</Link>
               </Button>
             </li>
           </ul>
