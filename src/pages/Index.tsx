@@ -3,28 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, MessageCircle, Sparkles, ShieldCheck, Search, Stethoscope, MapPin, Bell, HeartPulse, Globe2, Users, BookOpen, Quote, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/hero-afyapulse.jpg";
+import { useLanguage } from "@/i18n/LanguageContext";
 
-const counters = [
-  { value: 25, suffix: "+", label: "Maladies documentées", icon: BookOpen },
-  { value: 200, suffix: "+", label: "Cliniques référencées", icon: MapPin },
-  { value: 10, suffix: "", label: "Régions couvertes", icon: Globe2 },
-  { value: 50000, suffix: "+", label: "Utilisateurs informés", icon: Users },
-];
-
-const whyChoose = [
-  { icon: ShieldCheck, title: "Information vérifiée", desc: "Toutes nos fiches sont basées sur des sources officielles : OMS, MSAS et Africa CDC." },
-  { icon: Globe2, title: "Pensé pour l'Afrique", desc: "Contenu localisé en français, adapté aux réalités sanitaires camerounaises et sub-sahariennes." },
-  { icon: HeartPulse, title: "Assistance 24/7", desc: "Un assistant IA bilingue FR/EN disponible à tout moment pour répondre à vos questions santé." },
-  { icon: MapPin, title: "Réseau de proximité", desc: "Plus de 200 structures de santé géolocalisées avec itinéraires et appel direct en un clic." },
-  { icon: Sparkles, title: "Quiz personnalisé", desc: "Évaluation rapide en 2 minutes pour une orientation médicale adaptée à votre profil." },
-  { icon: Bell, title: "Alertes épidémiques", desc: "Soyez prévenu en temps réel des risques sanitaires dans votre région." },
-];
-
-const testimonials = [
-  { name: "Aïcha N.", role: "Mère de famille · Douala", text: "AfyaPulse m'a aidée à comprendre les symptômes du paludisme chez mon fils. Le quiz m'a orientée vers la bonne clinique.", rating: 5 },
-  { name: "Dr. Etienne M.", role: "Médecin généraliste · Yaoundé", text: "Une plateforme indispensable. Je la recommande à mes patients pour qu'ils s'informent avant la consultation.", rating: 5 },
-  { name: "Samuel K.", role: "Étudiant · Bafoussam", text: "L'assistant IA m'a sauvé pendant un épisode de typhoïde. Réponses claires et orientation rapide vers les urgences.", rating: 5 },
-];
+const partners = ["OMS", "UNICEF", "MSF", "Ministère Santé", "Croix-Rouge", "Africa CDC", "USAID"];
 
 function useCountUp(target: number, duration = 2000) {
   const [value, setValue] = useState(0);
@@ -70,24 +51,46 @@ const Counter = ({ target, suffix, label, Icon }: { target: number; suffix: stri
   );
 };
 
-const featured = [
-  { name: "Paludisme", category: "Infectieuse", color: "bg-warning/10 text-warning ring-warning/20", desc: "Première cause de mortalité infantile en Afrique." },
-  { name: "Typhoïde", category: "Infectieuse", color: "bg-warning/10 text-warning ring-warning/20", desc: "Liée à l'eau et aux conditions sanitaires." },
-  { name: "VIH / SIDA", category: "Chronique", color: "bg-info/10 text-info ring-info/20", desc: "Prévention, dépistage et accès aux traitements." },
-  { name: "Choléra", category: "Infectieuse", color: "bg-warning/10 text-warning ring-warning/20", desc: "Épidémies saisonnières — hygiène et hydratation." },
-  { name: "Diabète", category: "Chronique", color: "bg-info/10 text-info ring-info/20", desc: "Gestion long terme et alimentation équilibrée." },
-  { name: "Hypertension", category: "Chronique", color: "bg-info/10 text-info ring-info/20", desc: "Le tueur silencieux — dépistage régulier essentiel." },
-];
-
-const steps = [
-  { icon: Search, title: "Cherche", desc: "Trouve des informations fiables sur les maladies courantes en Afrique." },
-  { icon: Sparkles, title: "Comprends", desc: "Symptômes, prévention, traitement — vulgarisés en français clair." },
-  { icon: Stethoscope, title: "Agis", desc: "Localise un médecin, parle à notre AI ou contacte les urgences." },
-];
-
-const partners = ["OMS", "UNICEF", "MSF", "Ministère Santé", "Croix-Rouge", "Africa CDC", "USAID"];
-
 const Index = () => {
+  const { t } = useLanguage();
+
+  const counters = [
+    { value: 25, suffix: "+", label: t("index.counter1"), icon: BookOpen },
+    { value: 200, suffix: "+", label: t("index.counter2"), icon: MapPin },
+    { value: 10, suffix: "", label: t("index.counter3"), icon: Globe2 },
+    { value: 50000, suffix: "+", label: t("index.counter4"), icon: Users },
+  ];
+
+  const whyChoose = [
+    { icon: ShieldCheck, title: t("index.why.1.title"), desc: t("index.why.1.desc") },
+    { icon: Globe2, title: t("index.why.2.title"), desc: t("index.why.2.desc") },
+    { icon: HeartPulse, title: t("index.why.3.title"), desc: t("index.why.3.desc") },
+    { icon: MapPin, title: t("index.why.4.title"), desc: t("index.why.4.desc") },
+    { icon: Sparkles, title: t("index.why.5.title"), desc: t("index.why.5.desc") },
+    { icon: Bell, title: t("index.why.6.title"), desc: t("index.why.6.desc") },
+  ];
+
+  const testimonials = [
+    { name: "Aïcha N.", role: t("index.testi.1.role"), text: t("index.testi.1.text"), rating: 5 },
+    { name: "Dr. Etienne M.", role: t("index.testi.2.role"), text: t("index.testi.2.text"), rating: 5 },
+    { name: "Samuel K.", role: t("index.testi.3.role"), text: t("index.testi.3.text"), rating: 5 },
+  ];
+
+  const featured = [
+    { name: "Paludisme", category: t("dcat.Infectieuse"), color: "bg-warning/10 text-warning ring-warning/20", desc: t("index.featured.d1.desc") },
+    { name: "Typhoïde", category: t("dcat.Infectieuse"), color: "bg-warning/10 text-warning ring-warning/20", desc: t("index.featured.d2.desc") },
+    { name: "VIH / SIDA", category: t("dcat.Chronique"), color: "bg-info/10 text-info ring-info/20", desc: t("index.featured.d3.desc") },
+    { name: "Choléra", category: t("dcat.Infectieuse"), color: "bg-warning/10 text-warning ring-warning/20", desc: t("index.featured.d4.desc") },
+    { name: "Diabète", category: t("dcat.Chronique"), color: "bg-info/10 text-info ring-info/20", desc: t("index.featured.d5.desc") },
+    { name: "Hypertension", category: t("dcat.Chronique"), color: "bg-info/10 text-info ring-info/20", desc: t("index.featured.d6.desc") },
+  ];
+
+  const steps = [
+    { icon: Search, title: t("index.steps.1.title"), desc: t("index.steps.1.desc") },
+    { icon: Sparkles, title: t("index.steps.2.title"), desc: t("index.steps.2.desc") },
+    { icon: Stethoscope, title: t("index.steps.3.title"), desc: t("index.steps.3.desc") },
+  ];
+
   return (
     <main className="min-h-screen">
       {/* HERO */}
@@ -96,26 +99,25 @@ const Index = () => {
           <div className="lg:col-span-7 animate-fade-up">
             <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/10">
               <span className="h-1.5 w-1.5 rounded-full bg-primary-glow animate-pulse-ring" />
-              Plateforme de sensibilisation santé · Cameroun &amp; Afrique francophone
+              {t("index.hero.badge")}
             </span>
             <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] text-primary">
-              Comprendre pour mieux <span className="text-primary-glow">se soigner</span>.
+              {t("index.hero.title1")} <span className="text-primary-glow">{t("index.hero.title2")}</span>.
             </h1>
             <p className="mt-5 max-w-xl text-lg text-foreground/70 leading-relaxed">
-              Votre guide santé pour l'Afrique. De l'information médicale fiable, en français,
-              pour vous et vos proches.
+              {t("index.hero.subtitle")}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild variant="hero" size="lg">
-                <Link to="/maladies">Explorer les maladies <ArrowRight className="h-4 w-4" /></Link>
+                <Link to="/maladies">{t("index.hero.cta1")} <ArrowRight className="h-4 w-4" /></Link>
               </Button>
               <Button asChild variant="soft" size="lg">
-                <Link to="/quiz">Faire le quiz santé</Link>
+                <Link to="/quiz">{t("index.hero.cta2")}</Link>
               </Button>
             </div>
             <div className="mt-8 flex items-center gap-5 text-xs text-foreground/60">
-              <div className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary-glow" /> Sources OMS &amp; MSAS</div>
-              <div className="flex items-center gap-1.5"><MessageCircle className="h-4 w-4 text-primary-glow" /> AI bilingue FR/EN</div>
+              <div className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary-glow" /> {t("index.hero.trust1")}</div>
+              <div className="flex items-center gap-1.5"><MessageCircle className="h-4 w-4 text-primary-glow" /> {t("index.hero.trust2")}</div>
             </div>
           </div>
 
@@ -125,7 +127,7 @@ const Index = () => {
               <div className="relative overflow-hidden rounded-[2rem] shadow-elevated ring-1 ring-border bg-card">
                 <img
                   src={heroImg}
-                  alt="Famille africaine en bonne santé — illustration éditoriale d'AfyaPulse"
+                  alt={t("index.hero.imgAlt")}
                   width={1280}
                   height={1024}
                   className="aspect-[5/4] w-full object-cover"
@@ -137,8 +139,8 @@ const Index = () => {
                     <ShieldCheck className="h-5 w-5" />
                   </span>
                   <div>
-                    <div className="text-xs text-foreground/60">Information vérifiée</div>
-                    <div className="text-sm font-semibold text-primary">Sources officielles</div>
+                    <div className="text-xs text-foreground/60">{t("index.hero.verifiedTag")}</div>
+                    <div className="text-sm font-semibold text-primary">{t("index.hero.verifiedSub")}</div>
                   </div>
                 </div>
               </div>
@@ -148,7 +150,7 @@ const Index = () => {
       </section>
 
       {/* COUNTERS */}
-      <section className="container-tight -mt-6 sm:-mt-10 relative z-10" aria-label="Chiffres clés AfyaPulse">
+      <section className="container-tight -mt-6 sm:-mt-10 relative z-10" aria-label={t("index.counters.aria")}>
         <div className="rounded-3xl bg-stats text-primary-foreground shadow-elevated p-8 sm:p-10 grid grid-cols-2 md:grid-cols-4 gap-8">
           {counters.map((c) => (
             <Counter key={c.label} target={c.value} suffix={c.suffix} label={c.label} Icon={c.icon} />
@@ -159,12 +161,12 @@ const Index = () => {
       {/* WHY CHOOSE US */}
       <section className="container-tight py-20 sm:py-24">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">Pourquoi AfyaPulse</p>
+          <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">{t("index.why.eyebrow")}</p>
           <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-primary">
-            La santé africaine, enfin accessible.
+            {t("index.why.title")}
           </h2>
           <p className="mt-3 text-foreground/70">
-            Une plateforme conçue par et pour les communautés d'Afrique francophone.
+            {t("index.why.sub")}
           </p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -187,32 +189,32 @@ const Index = () => {
       <section className="bg-secondary/40 border-y border-border">
         <div className="container-tight py-20">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">Témoignages</p>
+            <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">{t("index.testi.eyebrow")}</p>
             <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-primary">
-              Ils nous font confiance
+              {t("index.testi.title")}
             </h2>
             <p className="mt-3 text-foreground/70">
-              Des milliers de familles, soignants et étudiants utilisent AfyaPulse au quotidien.
+              {t("index.testi.sub")}
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t) => (
+            {testimonials.map((tm) => (
               <figure
-                key={t.name}
+                key={tm.name}
                 className="relative rounded-2xl bg-card ring-1 ring-border p-7 shadow-soft hover:shadow-elevated transition-smooth"
               >
                 <Quote className="absolute -top-3 left-6 h-7 w-7 text-primary-glow bg-card rounded-full p-1 ring-1 ring-border" aria-hidden />
-                <div className="flex gap-0.5 mb-4" aria-label={`Note ${t.rating} sur 5`}>
-                  {Array.from({ length: t.rating }).map((_, i) => (
+                <div className="flex gap-0.5 mb-4" aria-label={t("index.testi.ratingAria").replace("{n}", String(tm.rating))}>
+                  {Array.from({ length: tm.rating }).map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-warning text-warning" />
                   ))}
                 </div>
                 <blockquote className="text-sm text-foreground/80 leading-relaxed">
-                  « {t.text} »
+                  « {tm.text} »
                 </blockquote>
                 <figcaption className="mt-5 pt-5 border-t border-border">
-                  <div className="text-sm font-semibold text-primary">{t.name}</div>
-                  <div className="text-xs text-foreground/60">{t.role}</div>
+                  <div className="text-sm font-semibold text-primary">{tm.name}</div>
+                  <div className="text-xs text-foreground/60">{tm.role}</div>
                 </figcaption>
               </figure>
             ))}
@@ -224,14 +226,14 @@ const Index = () => {
       <section className="container-tight py-20 sm:py-24">
         <div className="flex items-end justify-between gap-6 flex-wrap mb-10">
           <div>
-            <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">Bibliothèque</p>
-            <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-primary">Maladies en vedette</h2>
+            <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">{t("index.featured.eyebrow")}</p>
+            <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-primary">{t("index.featured.title")}</h2>
             <p className="mt-2 text-foreground/70 max-w-xl">
-              Les pathologies prioritaires au Cameroun et en Afrique francophone.
+              {t("index.featured.sub")}
             </p>
           </div>
           <Button asChild variant="ghost" className="text-primary">
-            <Link to="/maladies">Voir toutes les maladies <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/maladies">{t("index.featured.cta")} <ArrowRight className="h-4 w-4" /></Link>
           </Button>
         </div>
 
@@ -247,7 +249,7 @@ const Index = () => {
               <h3 className="mt-4 text-xl font-semibold text-primary">{d.name}</h3>
               <p className="mt-2 text-sm text-foreground/70 leading-relaxed">{d.desc}</p>
               <Link to="/maladies" className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-primary-glow group-hover:gap-2 transition-all">
-                Lire la fiche <ArrowRight className="h-4 w-4" />
+                {t("index.featured.read")} <ArrowRight className="h-4 w-4" />
               </Link>
             </article>
           ))}
@@ -258,8 +260,8 @@ const Index = () => {
       <section className="bg-secondary/40 border-y border-border">
         <div className="container-tight py-20">
           <div className="text-center max-w-2xl mx-auto">
-            <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">Comment ça marche</p>
-            <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-primary">Trois étapes vers une meilleure santé</h2>
+            <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">{t("index.steps.eyebrow")}</p>
+            <h2 className="mt-2 text-3xl sm:text-4xl font-bold text-primary">{t("index.steps.title")}</h2>
           </div>
           <div className="mt-12 grid md:grid-cols-3 gap-6">
             {steps.map((s, i) => (
@@ -283,35 +285,35 @@ const Index = () => {
         <div className="rounded-3xl bg-primary-gradient p-8 sm:p-10 text-primary-foreground shadow-elevated relative overflow-hidden">
           <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-primary-foreground/10 blur-2xl" aria-hidden />
           <span className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-3 py-1.5 text-xs font-semibold">
-            <MessageCircle className="h-3.5 w-3.5" /> Assistant santé AI
+            <MessageCircle className="h-3.5 w-3.5" /> {t("index.chat.tag")}
           </span>
-          <h3 className="mt-5 text-2xl sm:text-3xl font-bold leading-tight">Tu as des symptômes ? Parle à notre AI.</h3>
+          <h3 className="mt-5 text-2xl sm:text-3xl font-bold leading-tight">{t("index.chat.title")}</h3>
           <p className="mt-3 text-primary-foreground/80 max-w-md">
-            Disponible 24h/24 en français et en anglais. Réponses claires, sources vérifiées, orientation médicale.
+            {t("index.chat.sub")}
           </p>
           <Button asChild size="lg" className="mt-7 bg-background text-primary hover:bg-background/90">
-            <Link to="/chat">Démarrer la conversation <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/chat">{t("index.chat.cta")} <ArrowRight className="h-4 w-4" /></Link>
           </Button>
         </div>
 
         <div className="rounded-3xl bg-card ring-1 ring-border p-8 sm:p-10 shadow-soft flex flex-col justify-between">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-info/10 px-3 py-1.5 text-xs font-semibold text-info">
-              <Sparkles className="h-3.5 w-3.5" /> Quiz santé
+              <Sparkles className="h-3.5 w-3.5" /> {t("index.quiz.tag")}
             </span>
             <h3 className="mt-5 text-2xl sm:text-3xl font-bold text-primary leading-tight">
-              Évalue ta santé en 2 minutes.
+              {t("index.quiz.title")}
             </h3>
             <p className="mt-3 text-foreground/70 max-w-md">
-              Profil, région, symptômes — reçois une orientation personnalisée et des conseils adaptés.
+              {t("index.quiz.sub")}
             </p>
           </div>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button asChild variant="hero" size="lg">
-              <Link to="/quiz">Commencer le quiz</Link>
+              <Link to="/quiz">{t("index.quiz.cta")}</Link>
             </Button>
             <Button asChild variant="soft" size="lg">
-              <Link to="/annuaire"><MapPin className="h-4 w-4" /> Trouver une clinique</Link>
+              <Link to="/annuaire"><MapPin className="h-4 w-4" /> {t("index.quiz.findClinic")}</Link>
             </Button>
           </div>
         </div>
@@ -321,7 +323,7 @@ const Index = () => {
       <section className="border-y border-border bg-muted/40">
         <div className="container-tight py-10 overflow-hidden">
           <p className="text-center text-xs font-semibold tracking-widest uppercase text-foreground/50 mb-6">
-            En partenariat avec
+            {t("index.partners")}
           </p>
           <div className="relative">
             <div className="flex gap-12 animate-marquee whitespace-nowrap">
@@ -340,13 +342,13 @@ const Index = () => {
         <div className="rounded-3xl bg-card ring-1 ring-border p-8 sm:p-12 shadow-soft grid md:grid-cols-2 gap-8 items-center">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-warning/10 px-3 py-1.5 text-xs font-semibold text-warning">
-              <Bell className="h-3.5 w-3.5" /> Alertes épidémiques
+              <Bell className="h-3.5 w-3.5" /> {t("index.newsletter.tag")}
             </span>
             <h3 className="mt-4 text-2xl sm:text-3xl font-bold text-primary">
-              Reste informé, protège ta communauté.
+              {t("index.newsletter.title")}
             </h3>
             <p className="mt-2 text-foreground/70">
-              Reçois nos conseils mensuels et alertes santé pour ton pays.
+              {t("index.newsletter.sub")}
             </p>
           </div>
           <form
@@ -356,10 +358,10 @@ const Index = () => {
             <input
               type="email"
               required
-              placeholder="ton@email.com"
+              placeholder="you@email.com"
               className="flex-1 h-12 rounded-xl border border-input bg-background px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-smooth"
             />
-            <Button variant="hero" size="lg" type="submit">Je m'abonne</Button>
+            <Button variant="hero" size="lg" type="submit">{t("index.newsletter.cta")}</Button>
           </form>
         </div>
       </section>

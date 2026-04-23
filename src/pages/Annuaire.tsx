@@ -26,12 +26,14 @@ import {
   type Clinic,
 } from "@/data/clinics";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type View = "list" | "map";
 type SortBy = "default" | "distance" | "name";
 type Availability = "all" | "open" | "24h";
 
 const Annuaire = () => {
+  const { t } = useLanguage();
   const [query, setQuery] = useState("");
   const [activeType, setActiveType] = useState<Clinic["type"] | "Tous">("Tous");
   const [commune, setCommune] = useState<string>("Toutes");
@@ -73,7 +75,7 @@ const Annuaire = () => {
 
   const locate = () => {
     if (!navigator.geolocation) {
-      toast({ title: "Géolocalisation indisponible", description: "Ton navigateur ne supporte pas la géolocalisation.", variant: "destructive" });
+      toast({ title: t("annuaire.geo.unavailable"), description: t("annuaire.geo.unavailableDesc"), variant: "destructive" });
       return;
     }
     setLocating(true);
@@ -82,11 +84,11 @@ const Annuaire = () => {
         setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setSortBy("distance");
         setLocating(false);
-        toast({ title: "Position détectée", description: "Tri par distance activé." });
+        toast({ title: t("annuaire.geo.detected"), description: t("annuaire.geo.detectedDesc") });
       },
       () => {
         setLocating(false);
-        toast({ title: "Position refusée", description: "Active la géolocalisation pour trier par distance.", variant: "destructive" });
+        toast({ title: t("annuaire.geo.refused"), description: t("annuaire.geo.refusedDesc"), variant: "destructive" });
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
@@ -113,25 +115,24 @@ const Annuaire = () => {
           to="/"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/60 hover:text-primary transition-smooth"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Retour à l'accueil
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {t("common.backHome")}
         </Link>
 
         <header className="mt-8 max-w-2xl animate-fade-up">
-          <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">Annuaire santé</p>
+          <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">{t("annuaire.eyebrow")}</p>
           <h1 className="mt-2 text-4xl sm:text-5xl font-bold text-primary leading-tight">
-            Médecins &amp; cliniques près de toi
+            {t("annuaire.title")}
           </h1>
           <p className="mt-4 text-lg text-foreground/70 leading-relaxed">
-            Recherche par ville ou spécialité, filtres avancés, et tri par distance grâce à la
-            géolocalisation.
+            {t("annuaire.intro")}
           </p>
         </header>
 
         <section
-          aria-label="Recherche et filtres"
+          aria-label={t("common.search")}
           className="mt-10 rounded-2xl bg-card ring-1 ring-border p-5 sm:p-6 shadow-soft"
         >
-          <label htmlFor="clinic-search" className="sr-only">Rechercher une clinique</label>
+          <label htmlFor="clinic-search" className="sr-only">{t("annuaire.searchAria")}</label>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40" aria-hidden="true" />
             <Input
@@ -139,7 +140,7 @@ const Annuaire = () => {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rechercher une ville, un nom ou une spécialité..."
+              placeholder={t("annuaire.searchPh")}
               className="h-12 pl-11 pr-11 text-base rounded-xl"
               aria-describedby="clinic-results-count"
             />
@@ -147,7 +148,7 @@ const Annuaire = () => {
               <button
                 onClick={() => setQuery("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-foreground/50 hover:text-primary hover:bg-secondary transition-smooth"
-                aria-label="Effacer la recherche"
+                aria-label={t("common.clear")}
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -155,13 +156,14 @@ const Annuaire = () => {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <div role="group" aria-label="Filtrer par type" className="flex flex-wrap gap-2">
-              {(["Tous", ...clinicTypes] as const).map((t) => {
-                const active = activeType === t;
+            <div role="group" aria-label={t("annuaire.filterByType")} className="flex flex-wrap gap-2">
+              {(["Tous", ...clinicTypes] as const).map((ty) => {
+                const active = activeType === ty;
+                const label = ty === "Tous" ? t("annuaire.allTypes") : t(`ctype.${ty}`);
                 return (
                   <button
-                    key={t}
-                    onClick={() => setActiveType(t)}
+                    key={ty}
+                    onClick={() => setActiveType(ty)}
                     aria-pressed={active}
                     className={`px-3.5 py-1.5 rounded-full text-xs font-semibold ring-1 transition-smooth ${
                       active
@@ -169,7 +171,7 @@ const Annuaire = () => {
                         : "bg-background text-foreground/70 ring-border hover:ring-primary/40 hover:text-primary"
                     }`}
                   >
-                    {t}
+                    {label}
                   </button>
                 );
               })}
@@ -183,7 +185,7 @@ const Annuaire = () => {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ring-1 ring-border text-foreground/70 hover:text-primary hover:ring-primary/40 transition-smooth"
               >
                 <Filter className="h-3.5 w-3.5" aria-hidden="true" />
-                Filtres avancés
+                {t("annuaire.advanced")}
                 {activeFiltersCount > 0 && (
                   <span className="ml-1 rounded-full bg-primary-glow text-primary-foreground px-1.5 text-[10px] font-bold">
                     {activeFiltersCount}
@@ -191,7 +193,7 @@ const Annuaire = () => {
                 )}
               </button>
 
-              <div role="group" aria-label="Vue" className="inline-flex rounded-full bg-secondary p-1 ring-1 ring-border">
+              <div role="group" aria-label={t("annuaire.viewAria")} className="inline-flex rounded-full bg-secondary p-1 ring-1 ring-border">
                 <button
                   onClick={() => setView("list")}
                   aria-pressed={view === "list"}
@@ -199,7 +201,7 @@ const Annuaire = () => {
                     view === "list" ? "bg-card text-primary shadow-soft" : "text-foreground/60"
                   }`}
                 >
-                  <List className="h-3.5 w-3.5" aria-hidden="true" /> Liste
+                  <List className="h-3.5 w-3.5" aria-hidden="true" /> {t("annuaire.viewList")}
                 </button>
                 <button
                   onClick={() => setView("map")}
@@ -208,7 +210,7 @@ const Annuaire = () => {
                     view === "map" ? "bg-card text-primary shadow-soft" : "text-foreground/60"
                   }`}
                 >
-                  <MapIcon className="h-3.5 w-3.5" aria-hidden="true" /> Carte
+                  <MapIcon className="h-3.5 w-3.5" aria-hidden="true" /> {t("annuaire.viewMap")}
                 </button>
               </div>
             </div>
@@ -221,7 +223,7 @@ const Annuaire = () => {
             >
               <div>
                 <label htmlFor="commune-filter" className="block text-xs font-semibold text-foreground/70 mb-1.5">
-                  Commune
+                  {t("annuaire.commune")}
                 </label>
                 <select
                   id="commune-filter"
@@ -229,14 +231,14 @@ const Annuaire = () => {
                   onChange={(e) => setCommune(e.target.value)}
                   className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
-                  <option value="Toutes">Toutes les communes</option>
+                  <option value="Toutes">{t("annuaire.allCommunes")}</option>
                   {allCommunes.map((c) => (<option key={c} value={c}>{c}</option>))}
                 </select>
               </div>
 
               <div>
                 <label htmlFor="specialty-filter" className="block text-xs font-semibold text-foreground/70 mb-1.5">
-                  Spécialité
+                  {t("annuaire.specialty")}
                 </label>
                 <select
                   id="specialty-filter"
@@ -244,14 +246,14 @@ const Annuaire = () => {
                   onChange={(e) => setSpecialty(e.target.value)}
                   className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
-                  <option value="Toutes">Toutes spécialités</option>
+                  <option value="Toutes">{t("annuaire.allSpecialties")}</option>
                   {allSpecialties.map((s) => (<option key={s} value={s}>{s}</option>))}
                 </select>
               </div>
 
               <div>
                 <label htmlFor="avail-filter" className="block text-xs font-semibold text-foreground/70 mb-1.5">
-                  Disponibilité
+                  {t("annuaire.availability")}
                 </label>
                 <select
                   id="avail-filter"
@@ -259,15 +261,15 @@ const Annuaire = () => {
                   onChange={(e) => setAvailability(e.target.value as Availability)}
                   className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
-                  <option value="all">Toutes</option>
-                  <option value="open">Ouvert maintenant</option>
-                  <option value="24h">Ouvert 24h/24</option>
+                  <option value="all">{t("annuaire.availAll")}</option>
+                  <option value="open">{t("annuaire.availOpen")}</option>
+                  <option value="24h">{t("annuaire.avail24")}</option>
                 </select>
               </div>
 
               <div>
                 <label htmlFor="sort-by" className="block text-xs font-semibold text-foreground/70 mb-1.5">
-                  Trier par
+                  {t("annuaire.sortBy")}
                 </label>
                 <div className="flex gap-2">
                   <select
@@ -276,16 +278,16 @@ const Annuaire = () => {
                     onChange={(e) => setSortBy(e.target.value as SortBy)}
                     className="flex-1 h-10 rounded-xl border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                   >
-                    <option value="default">Pertinence</option>
-                    <option value="name">Nom (A-Z)</option>
+                    <option value="default">{t("annuaire.sortDefault")}</option>
+                    <option value="name">{t("annuaire.sortName")}</option>
                     <option value="distance" disabled={!userPos}>
-                      Distance {userPos ? "" : "(géoloc requise)"}
+                      {t("annuaire.sortDistance")} {userPos ? "" : t("annuaire.geoRequired")}
                     </option>
                   </select>
                   <button
                     onClick={locate}
                     disabled={locating}
-                    aria-label="Utiliser ma position pour trier par distance"
+                    aria-label={t("annuaire.locateAria")}
                     className="h-10 w-10 grid place-items-center rounded-xl bg-secondary text-primary ring-1 ring-border hover:ring-primary/40 transition-smooth disabled:opacity-50"
                   >
                     <LocateFixed className={`h-4 w-4 ${locating ? "animate-pulse" : ""}`} aria-hidden="true" />
@@ -299,7 +301,7 @@ const Annuaire = () => {
                     onClick={resetFilters}
                     className="text-xs font-semibold text-primary-glow hover:underline"
                   >
-                    Réinitialiser tous les filtres
+                    {t("annuaire.resetAll")}
                   </button>
                 </div>
               )}
@@ -309,12 +311,12 @@ const Annuaire = () => {
 
         <div id="clinic-results-count" aria-live="polite" className="mt-6 flex items-center justify-between gap-3 flex-wrap">
           <p className="text-sm text-foreground/60">
-            {filtered.length} structure{filtered.length > 1 ? "s" : ""} trouvée{filtered.length > 1 ? "s" : ""}
-            {sortBy === "distance" && userPos && " · triées par distance"}
+            {filtered.length} {filtered.length > 1 ? t("annuaire.found.many") : t("annuaire.found.one")}
+            {sortBy === "distance" && userPos && ` · ${t("annuaire.sortedDistance")}`}
           </p>
           {sortBy === "distance" && userPos && (
             <span className="inline-flex items-center gap-1 text-xs text-primary-glow">
-              <ArrowDownUp className="h-3 w-3" aria-hidden="true" /> Tri actif
+              <ArrowDownUp className="h-3 w-3" aria-hidden="true" /> {t("annuaire.sortActive")}
             </span>
           )}
         </div>
@@ -346,7 +348,7 @@ const Annuaire = () => {
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${typeStyles[c.type]}`}>
-                          {c.type}
+                          {t(`ctype.${c.type}`)}
                         </span>
                         <span className="text-[11px] text-foreground/50">
                           {dist !== null ? `${dist.toFixed(1)} km` : c.region}
@@ -366,23 +368,23 @@ const Annuaire = () => {
 
         {filtered.length === 0 && (
           <div role="status" className="mt-10 rounded-2xl bg-card ring-1 ring-border p-12 text-center">
-            <p className="text-foreground/60">Aucune structure ne correspond à votre recherche.</p>
-            <Button variant="soft" className="mt-4" onClick={resetFilters}>Réinitialiser</Button>
+            <p className="text-foreground/60">{t("annuaire.empty")}</p>
+            <Button variant="soft" className="mt-4" onClick={resetFilters}>{t("common.reset")}</Button>
           </div>
         )}
 
-        <aside aria-label="Urgences médicales" className="mt-10 rounded-2xl bg-destructive/10 ring-1 ring-destructive/20 p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
+        <aside aria-label={t("annuaire.emergencyTag")} className="mt-10 rounded-2xl bg-destructive/10 ring-1 ring-destructive/20 p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-destructive text-destructive-foreground">
               <Phone className="h-5 w-5" aria-hidden="true" />
             </span>
             <div>
-              <div className="text-xs font-semibold text-destructive">Urgence médicale</div>
-              <div className="font-bold text-primary text-lg">SAMU Cameroun · 15-999</div>
+              <div className="text-xs font-semibold text-destructive">{t("annuaire.emergencyTag")}</div>
+              <div className="font-bold text-primary text-lg">{t("annuaire.emergencyLabel")}</div>
             </div>
           </div>
           <Button asChild variant="default" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-            <a href="tel:15999" aria-label="Appeler le SAMU au 15-999">Appeler maintenant</a>
+            <a href="tel:15999" aria-label={t("common.callNow")}>{t("common.callNow")}</a>
           </Button>
         </aside>
       </div>
@@ -391,6 +393,7 @@ const Annuaire = () => {
 };
 
 const ClinicCard = ({ clinic, userPos }: { clinic: Clinic; userPos: { lat: number; lng: number } | null }) => {
+  const { t } = useLanguage();
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${clinic.lat},${clinic.lng}`;
   const telHref = `tel:${clinic.phone.replace(/\s/g, "")}`;
   const dist = userPos ? distanceKm(userPos, clinic) : null;
@@ -400,15 +403,15 @@ const ClinicCard = ({ clinic, userPos }: { clinic: Clinic; userPos: { lat: numbe
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${typeStyles[clinic.type]}`}>
-            {clinic.type}
+            {t(`ctype.${clinic.type}`)}
           </span>
           {clinic.available ? (
             <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold bg-success/10 text-success ring-1 ring-success/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" /> Ouvert
+              <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" /> {t("annuaire.open")}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold bg-muted text-muted-foreground ring-1 ring-border">
-              Fermé
+              {t("annuaire.closed")}
             </span>
           )}
         </div>
@@ -435,13 +438,13 @@ const ClinicCard = ({ clinic, userPos }: { clinic: Clinic; userPos: { lat: numbe
       </ul>
       <div className="mt-5 flex flex-wrap gap-2">
         <Button asChild variant="hero" size="sm" className="flex-1 min-w-[140px]">
-          <a href={telHref} aria-label={`Appeler ${clinic.name} au ${clinic.phone}`}>
-            <Phone className="h-4 w-4" aria-hidden="true" /> Appeler
+          <a href={telHref} aria-label={`${t("common.call")} ${clinic.name}`}>
+            <Phone className="h-4 w-4" aria-hidden="true" /> {t("common.call")}
           </a>
         </Button>
         <Button asChild variant="soft" size="sm" className="flex-1 min-w-[140px]">
-          <a href={mapsUrl} target="_blank" rel="noreferrer" aria-label={`Itinéraire vers ${clinic.name}`}>
-            <Navigation className="h-4 w-4" aria-hidden="true" /> Itinéraire
+          <a href={mapsUrl} target="_blank" rel="noreferrer" aria-label={`${t("common.directions")} → ${clinic.name}`}>
+            <Navigation className="h-4 w-4" aria-hidden="true" /> {t("common.directions")}
           </a>
         </Button>
       </div>
@@ -457,6 +460,7 @@ const SimpleMap = ({
   onSelect: (id: string) => void;
   userPos: { lat: number; lng: number } | null;
 }) => {
+  const { t } = useLanguage();
   const minLng = 8.5, maxLng = 16.2;
   const minLat = 1.7, maxLat = 13.1;
   const w = 600, h = 720;
@@ -534,19 +538,19 @@ const SimpleMap = ({
               </div>
             </div>
             <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${typeStyles[focusedClinic.type]}`}>
-              {focusedClinic.type}
+              {t(`ctype.${focusedClinic.type}`)}
             </span>
           </div>
           <div className="mt-3 flex gap-2">
             <Button asChild variant="hero" size="sm" className="flex-1">
-              <a href={`tel:${focusedClinic.phone.replace(/\s/g, "")}`}><Phone className="h-4 w-4" aria-hidden="true" /> Appeler</a>
+              <a href={`tel:${focusedClinic.phone.replace(/\s/g, "")}`}><Phone className="h-4 w-4" aria-hidden="true" /> {t("common.call")}</a>
             </Button>
             <Button asChild variant="soft" size="sm" className="flex-1">
               <a
                 href={`https://www.google.com/maps/dir/?api=1&destination=${focusedClinic.lat},${focusedClinic.lng}`}
                 target="_blank" rel="noreferrer"
               >
-                <Navigation className="h-4 w-4" aria-hidden="true" /> Itinéraire
+                <Navigation className="h-4 w-4" aria-hidden="true" /> {t("common.directions")}
               </a>
             </Button>
           </div>

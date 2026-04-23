@@ -10,8 +10,10 @@ import {
   severityStyles,
   type DiseaseCategory,
 } from "@/data/diseases";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Maladies = () => {
+  const { t } = useLanguage();
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<DiseaseCategory | "Toutes">("Toutes");
 
@@ -35,29 +37,28 @@ const Maladies = () => {
           to="/"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/60 hover:text-primary transition-smooth rounded"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Retour à l'accueil
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {t("common.backHome")}
         </Link>
 
         <header className="mt-8 max-w-2xl animate-fade-up">
           <p className="text-xs font-semibold tracking-widest uppercase text-primary-glow">
-            Bibliothèque
+            {t("maladies.eyebrow")}
           </p>
           <h1 className="mt-2 text-4xl sm:text-5xl font-bold text-primary leading-tight">
-            Bibliothèque des maladies
+            {t("maladies.title")}
           </h1>
           <p className="mt-4 text-lg text-foreground/70 leading-relaxed">
-            Recherche, filtres par catégorie, fiches détaillées : symptômes, prévention et traitement.
-            Sources OMS &amp; MSAS.
+            {t("maladies.intro")}
           </p>
         </header>
 
         {/* Search + filters */}
         <section
-          aria-label="Recherche et filtres"
+          aria-label={t("common.search")}
           className="mt-10 rounded-2xl bg-card ring-1 ring-border p-5 sm:p-6 shadow-soft"
         >
           <label htmlFor="disease-search" className="sr-only">
-            Rechercher une maladie ou un symptôme
+            {t("maladies.searchAria")}
           </label>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40" aria-hidden="true" />
@@ -66,7 +67,7 @@ const Maladies = () => {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rechercher une maladie, un symptôme..."
+              placeholder={t("maladies.searchPh")}
               className="h-12 pl-11 pr-11 text-base rounded-xl"
               aria-describedby="disease-results-count"
             />
@@ -74,16 +75,17 @@ const Maladies = () => {
               <button
                 onClick={() => setQuery("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-foreground/50 hover:text-primary hover:bg-secondary transition-smooth"
-                aria-label="Effacer la recherche"
+                aria-label={t("common.clear")}
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
             )}
           </div>
 
-          <div role="group" aria-label="Filtrer par catégorie" className="mt-4 flex flex-wrap gap-2">
+          <div role="group" aria-label={t("maladies.filterAria")} className="mt-4 flex flex-wrap gap-2">
             {(["Toutes", ...categories] as const).map((cat) => {
               const active = activeCat === cat;
+              const label = cat === "Toutes" ? t("dcat.Toutes") : t(`dcat.${cat}`);
               return (
                 <button
                   key={cat}
@@ -95,7 +97,7 @@ const Maladies = () => {
                       : "bg-background text-foreground/70 ring-border hover:ring-primary/40 hover:text-primary"
                   }`}
                 >
-                  {cat}
+                  {label}
                 </button>
               );
             })}
@@ -103,7 +105,7 @@ const Maladies = () => {
         </section>
 
         <p id="disease-results-count" aria-live="polite" className="mt-6 text-sm text-foreground/60">
-          {filtered.length} {filtered.length > 1 ? "fiches trouvées" : "fiche trouvée"}
+          {filtered.length} {filtered.length > 1 ? t("maladies.found.many") : t("maladies.found.one")}
         </p>
 
         <ul className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-5 list-none p-0">
@@ -112,14 +114,14 @@ const Maladies = () => {
               <Link
                 to={`/maladie/${d.slug}`}
                 className="group block h-full rounded-2xl bg-card ring-1 ring-border p-6 shadow-soft hover:shadow-elevated hover:-translate-y-1 transition-smooth"
-                aria-label={`Voir la fiche complète : ${d.name}, catégorie ${d.category}, gravité ${d.severity}`}
+                aria-label={`${d.name} — ${t(`dcat.${d.category}`)}, ${t(`sev.${d.severity}`)}`}
               >
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${categoryStyles[d.category]}`}>
-                    {d.category}
+                    {t(`dcat.${d.category}`)}
                   </span>
                   <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${severityStyles[d.severity]}`}>
-                    {d.severity}
+                    {t(`sev.${d.severity}`)}
                   </span>
                 </div>
                 <h2 className="mt-4 text-xl font-semibold text-primary">{d.name}</h2>
@@ -127,7 +129,7 @@ const Maladies = () => {
                   {d.shortDesc}
                 </p>
                 <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-primary-glow group-hover:gap-2 transition-all" aria-hidden="true">
-                  Voir la fiche →
+                  {t("maladies.viewCard")} →
                 </span>
               </Link>
             </li>
@@ -136,9 +138,9 @@ const Maladies = () => {
 
         {filtered.length === 0 && (
           <div role="status" className="mt-10 rounded-2xl bg-card ring-1 ring-border p-12 text-center">
-            <p className="text-foreground/60">Aucune maladie ne correspond à votre recherche.</p>
+            <p className="text-foreground/60">{t("maladies.empty")}</p>
             <Button variant="soft" className="mt-4" onClick={() => { setQuery(""); setActiveCat("Toutes"); }}>
-              Réinitialiser les filtres
+              {t("maladies.resetFilters")}
             </Button>
           </div>
         )}
