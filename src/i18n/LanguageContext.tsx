@@ -94,8 +94,63 @@ const DICT: Dict = {
   "contact.urgentText": { FR: "AfyaPulse n'est pas un service d'urgence. En cas de danger vital, appelle immédiatement le SAMU.", EN: "AfyaPulse is not an emergency service. In life-threatening situations, call SAMU immediately." },
   "contact.urgentBtn": { FR: "Appeler le 15-999", EN: "Call 15-999" },
 
-  // Blog newsletter
-  "blog.newsletterOk": { FR: "Inscription réussie ! Vérifie ta boîte email.", EN: "Subscribed! Check your inbox." },
+  // Blog
+  "blog.eyebrow": { FR: "Blog AfyaPulse", EN: "AfyaPulse Blog" },
+  "blog.title1": { FR: "Actualités, alertes &", EN: "News, alerts &" },
+  "blog.title2": { FR: "santé africaine", EN: "African health" },
+  "blog.intro": {
+    FR: "Articles de fond, alertes épidémiques et témoignages — vérifiés par des médecins du Cameroun et d'Afrique francophone.",
+    EN: "In-depth articles, epidemic alerts and testimonials — verified by doctors from Cameroon and French-speaking Africa.",
+  },
+  "blog.searchPh": { FR: "Rechercher un article, un sujet, un tag…", EN: "Search an article, topic, or tag…" },
+  "blog.searchAria": { FR: "Rechercher un article", EN: "Search an article" },
+  "blog.clearSearch": { FR: "Effacer la recherche", EN: "Clear search" },
+  "blog.filterAria": { FR: "Filtrer par catégorie", EN: "Filter by category" },
+  "blog.all": { FR: "Toutes", EN: "All" },
+  "blog.found": { FR: "article(s) trouvé(s)", EN: "article(s) found" },
+  "blog.featured": { FR: "★ À la une", EN: "★ Featured" },
+  "blog.read": { FR: "Lire l'article", EN: "Read article" },
+  "blog.readShort": { FR: "Lire", EN: "Read" },
+  "blog.empty.title": { FR: "Aucun article trouvé", EN: "No articles found" },
+  "blog.empty.text": { FR: "Essaie un autre mot-clé ou réinitialise les filtres.", EN: "Try another keyword or reset the filters." },
+  "blog.empty.reset": { FR: "Réinitialiser", EN: "Reset" },
+  "blog.minRead": { FR: "min", EN: "min" },
+  "blog.newsletter.tag": { FR: "Newsletter santé", EN: "Health newsletter" },
+  "blog.newsletter.title": { FR: "Reçois nos articles & alertes directement par email.", EN: "Get our articles & alerts straight to your inbox." },
+  "blog.newsletter.text": { FR: "Une fois par semaine, sans spam. Désinscription en un clic.", EN: "Once a week, no spam. Unsubscribe in one click." },
+  "blog.newsletter.emailAria": { FR: "Adresse email", EN: "Email address" },
+  "blog.newsletter.subscribe": { FR: "Je m'abonne", EN: "Subscribe" },
+  "blog.newsletter.ok": { FR: "Inscription réussie ! Vérifie ta boîte email.", EN: "Subscribed! Check your inbox." },
+
+  // Categories
+  "cat.Alerte": { FR: "Alerte", EN: "Alert" },
+  "cat.Prévention": { FR: "Prévention", EN: "Prevention" },
+  "cat.Nutrition": { FR: "Nutrition", EN: "Nutrition" },
+  "cat.Témoignage": { FR: "Témoignage", EN: "Testimonial" },
+  "cat.Recherche": { FR: "Recherche", EN: "Research" },
+
+  // Article detail
+  "article.back": { FR: "Retour au blog", EN: "Back to blog" },
+  "article.minRead": { FR: "min de lecture", EN: "min read" },
+  "article.share": { FR: "Partager", EN: "Share" },
+  "article.shareAria": { FR: "Partager cet article", EN: "Share this article" },
+  "article.linkCopied": { FR: "Lien copié", EN: "Link copied" },
+  "article.linkCopiedDesc": { FR: "Tu peux maintenant le partager.", EN: "You can now share it." },
+  "article.disclaimer": {
+    FR: "Cet article fournit une information générale et ne remplace pas un avis médical. En cas d'urgence, appelle le SAMU 15 / 999.",
+    EN: "This article provides general information and does not replace medical advice. In an emergency, call SAMU 15 / 999.",
+  },
+  "article.related": { FR: "À lire aussi", EN: "Also read" },
+  "article.allArticles": { FR: "Tous les articles", EN: "All articles" },
+  "article.notFound": { FR: "Article introuvable", EN: "Article not found" },
+  "article.notFoundText": { FR: "Cet article n'existe pas ou a été déplacé.", EN: "This article doesn't exist or has been moved." },
+
+  // Contact validation
+  "contact.err.name": { FR: "Le nom est requis (2–100 caractères).", EN: "Name is required (2–100 characters)." },
+  "contact.err.email": { FR: "Adresse email invalide.", EN: "Invalid email address." },
+  "contact.err.subject": { FR: "Merci de choisir un sujet.", EN: "Please select a subject." },
+  "contact.err.message": { FR: "Le message doit faire entre 10 et 1000 caractères.", EN: "Message must be between 10 and 1000 characters." },
+  "contact.err.fix": { FR: "Merci de corriger les erreurs avant d'envoyer.", EN: "Please fix the errors before sending." },
 };
 
 interface LanguageContextValue {

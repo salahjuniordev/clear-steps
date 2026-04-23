@@ -4,12 +4,11 @@ import { ArrowLeft, Calendar, Clock, Share2, ArrowRight, BookOpen, AlertTriangle
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import {
-  articles,
   getArticleBySlug,
   getRelatedArticles,
-  formatDate,
   type ArticleCategory,
 } from "@/data/articles";
+import { useLanguage, type Lang } from "@/i18n/LanguageContext";
 
 const categoryColor = (cat: ArticleCategory) => {
   switch (cat) {
@@ -21,8 +20,14 @@ const categoryColor = (cat: ArticleCategory) => {
   }
 };
 
+const formatDateLocale = (iso: string, lang: Lang) =>
+  new Date(iso).toLocaleDateString(lang === "FR" ? "fr-FR" : "en-US", {
+    day: "numeric", month: "long", year: "numeric",
+  });
+
 const BlogArticle = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { t, lang } = useLanguage();
   const article = slug ? getArticleBySlug(slug) : undefined;
 
   useEffect(() => {
@@ -30,18 +35,18 @@ const BlogArticle = () => {
       document.title = `${article.title} · AfyaPulse`;
       window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
     } else {
-      document.title = "Article introuvable · AfyaPulse";
+      document.title = `${t("article.notFound")} · AfyaPulse`;
     }
-  }, [article]);
+  }, [article, t]);
 
   if (!article) {
     return (
       <main id="main" className="min-h-screen bg-hero">
         <div className="container-tight py-20 text-center">
-          <h1 className="text-3xl font-bold text-primary">Article introuvable</h1>
-          <p className="mt-3 text-foreground/70">Cet article n'existe pas ou a été déplacé.</p>
+          <h1 className="text-3xl font-bold text-primary">{t("article.notFound")}</h1>
+          <p className="mt-3 text-foreground/70">{t("article.notFoundText")}</p>
           <Button asChild variant="hero" className="mt-6">
-            <Link to="/blog">Retour au blog</Link>
+            <Link to="/blog">{t("article.back")}</Link>
           </Button>
         </div>
       </main>
@@ -61,20 +66,20 @@ const BlogArticle = () => {
         await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(window.location.href);
-        toast({ title: "Lien copié", description: "Tu peux maintenant le partager." });
+        toast({ title: t("article.linkCopied"), description: t("article.linkCopiedDesc") });
       }
     } catch {
-      // user cancelled — silent
+      // user cancelled
     }
   };
 
-  // JSON-LD for SEO
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
     description: article.excerpt,
     datePublished: article.publishedAt,
+    inLanguage: lang === "FR" ? "fr" : "en",
     author: { "@type": "Person", name: article.author },
     publisher: { "@type": "Organization", name: "AfyaPulse" },
     keywords: article.tags.join(", "),
@@ -85,40 +90,36 @@ const BlogArticle = () => {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <article className="container-tight py-10 sm:py-14">
-        {/* Breadcrumb */}
         <Link
           to="/blog"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/60 hover:text-primary transition-smooth"
         >
-          <ArrowLeft className="h-4 w-4" /> Retour au blog
+          <ArrowLeft className="h-4 w-4" /> {t("article.back")}
         </Link>
 
-        {/* Header */}
         <header className="mt-8 max-w-3xl mx-auto text-center">
           <span className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ${categoryColor(article.category)}`}>
-            {article.category}
+            {t(`cat.${article.category}`)}
           </span>
           <h1 className="mt-5 text-3xl sm:text-5xl font-bold text-primary leading-[1.1]">
             {article.title}
           </h1>
           <p className="mt-5 text-lg text-foreground/70 leading-relaxed">{article.excerpt}</p>
           <div className="mt-7 flex items-center justify-center gap-5 text-sm text-foreground/60 flex-wrap">
-            <span className="inline-flex items-center gap-1.5"><Calendar className="h-4 w-4" /> {formatDate(article.publishedAt)}</span>
-            <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" /> {article.readMinutes} min de lecture</span>
+            <span className="inline-flex items-center gap-1.5"><Calendar className="h-4 w-4" /> {formatDateLocale(article.publishedAt, lang)}</span>
+            <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" /> {article.readMinutes} {t("article.minRead")}</span>
             {article.region && (
               <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {article.region}</span>
             )}
           </div>
         </header>
 
-        {/* Cover */}
         <div className={`mt-10 max-w-4xl mx-auto aspect-[21/9] rounded-3xl bg-gradient-to-br ${article.cover} relative overflow-hidden ring-1 ring-border shadow-elevated`}>
           <div className="absolute inset-0 grid place-items-center opacity-25">
             <BookOpen className="h-32 w-32 text-primary-foreground/40" aria-hidden />
           </div>
         </div>
 
-        {/* Author + share bar */}
         <div className="mt-8 max-w-2xl mx-auto flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
             <span className="grid h-12 w-12 place-items-center rounded-full bg-primary-gradient text-primary-foreground font-bold">
@@ -129,12 +130,11 @@ const BlogArticle = () => {
               {article.authorRole && <div className="text-xs text-foreground/60">{article.authorRole}</div>}
             </div>
           </div>
-          <Button onClick={handleShare} variant="soft" size="sm" aria-label="Partager cet article">
-            <Share2 className="h-4 w-4" /> Partager
+          <Button onClick={handleShare} variant="soft" size="sm" aria-label={t("article.shareAria")}>
+            <Share2 className="h-4 w-4" /> {t("article.share")}
           </Button>
         </div>
 
-        {/* Body */}
         <div className="mt-10 max-w-2xl mx-auto">
           {article.content.map((block, i) => {
             if (block.type === "h2") {
@@ -165,31 +165,25 @@ const BlogArticle = () => {
             return <p key={i} className="my-5 text-foreground/80 leading-relaxed text-[1.05rem]">{block.text}</p>;
           })}
 
-          {/* Tags */}
           <div className="mt-12 flex flex-wrap gap-2">
-            {article.tags.map((t) => (
-              <span key={t} className="inline-flex items-center rounded-full bg-secondary px-3 py-1 text-xs font-medium text-primary ring-1 ring-primary/10">
-                #{t}
+            {article.tags.map((tag) => (
+              <span key={tag} className="inline-flex items-center rounded-full bg-secondary px-3 py-1 text-xs font-medium text-primary ring-1 ring-primary/10">
+                #{tag}
               </span>
             ))}
           </div>
 
-          {/* Disclaimer */}
           <div className="mt-10 rounded-2xl bg-warning/10 ring-1 ring-warning/20 p-5 flex gap-3">
             <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" aria-hidden />
-            <p className="text-sm text-foreground/80">
-              Cet article fournit une information générale et ne remplace pas un avis médical.
-              En cas d'urgence, appelle le <strong className="text-warning">SAMU 15 / 999</strong>.
-            </p>
+            <p className="text-sm text-foreground/80">{t("article.disclaimer")}</p>
           </div>
         </div>
       </article>
 
-      {/* Related */}
       {related.length > 0 && (
         <section className="container-tight pb-20">
           <div className="border-t border-border pt-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-8">À lire aussi</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-8">{t("article.related")}</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {related.map((a) => (
                 <Link
@@ -199,7 +193,7 @@ const BlogArticle = () => {
                 >
                   <div className={`aspect-[16/10] bg-gradient-to-br ${a.cover} relative`}>
                     <span className={`absolute top-3 left-3 inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 backdrop-blur bg-card/90 ${categoryColor(a.category)}`}>
-                      {a.category}
+                      {t(`cat.${a.category}`)}
                     </span>
                   </div>
                   <div className="p-5">
@@ -207,7 +201,7 @@ const BlogArticle = () => {
                       {a.title}
                     </h3>
                     <p className="mt-2 text-xs text-foreground/60 inline-flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {a.readMinutes} min · {formatDate(a.publishedAt)}
+                      <Clock className="h-3 w-3" /> {a.readMinutes} {t("article.minRead")} · {formatDateLocale(a.publishedAt, lang)}
                     </p>
                   </div>
                 </Link>
@@ -216,7 +210,7 @@ const BlogArticle = () => {
 
             <div className="mt-10 text-center">
               <Button asChild variant="soft" size="lg">
-                <Link to="/blog">Tous les articles <ArrowRight className="h-4 w-4" /></Link>
+                <Link to="/blog">{t("article.allArticles")} <ArrowRight className="h-4 w-4" /></Link>
               </Button>
             </div>
           </div>
@@ -227,6 +221,3 @@ const BlogArticle = () => {
 };
 
 export default BlogArticle;
-
-// Helper: pre-touch articles import so unused warning doesn't fire in some bundlers
-void articles;

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Mail, MessageCircle, MapPin, Phone, Send, AlertTriangle } from "lucide-react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,16 +21,84 @@ const Contact = () => {
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     document.title = lang === "FR" ? "Contact · AfyaPulse" : "Contact · AfyaPulse";
   }, [lang]);
 
+  const schema = useMemo(
+    () =>
+      z.object({
+        name: z.string().trim().min(2, t("contact.err.name")).max(100, t("contact.err.name")),
+        email: z.string().trim().email(t("contact.err.email")).max(255, t("contact.err.email")),
+        subject: z.enum(["general", "partner", "press", "report"], {
+          errorMap: () => ({ message: t("contact.err.subject") }),
+        }),
+        message: z.string().trim().min(10, t("contact.err.message")).max(1000, t("contact.err.message")),
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [lang]
+  );
+
+  // Re-validate displayed errors when language switches
+  useEffect(() => {
+    if (Object.keys(errors).length === 0) return;
+    const result = schema.safeParse({ name, email, subject, message });
+    if (!result.success) {
+      const next: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const k = issue.path[0] as string;
+        if (touched[k]) next[k] = issue.message;
+      }
+      setErrors(next);
+    } else {
+      setErrors({});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  const validateField = (field: string, values = { name, email, subject, message }) => {
+    const result = schema.safeParse(values);
+    if (result.success) {
+      setErrors((prev) => {
+        const { [field]: _, ...rest } = prev;
+        return rest;
+      });
+      return;
+    }
+    const issue = result.error.issues.find((i) => i.path[0] === field);
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (issue) next[field] = issue.message;
+      else delete next[field];
+      return next;
+    });
+  };
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setTouched({ name: true, email: true, subject: true, message: true });
+    const result = schema.safeParse({ name, email, subject, message });
+    if (!result.success) {
+      const next: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const k = issue.path[0] as string;
+        if (!next[k]) next[k] = issue.message;
+      }
+      setErrors(next);
+      toast({ title: t("contact.err.fix"), variant: "destructive" });
+      return;
+    }
+    setErrors({});
     toast({ title: t("contact.sent") });
     setName(""); setEmail(""); setSubject(""); setMessage("");
+    setTouched({});
   };
+
+  const fieldClass = (k: string) =>
+    errors[k] ? "border-destructive focus-visible:ring-destructive" : "";
 
   return (
     <main id="main" className="min-h-screen bg-hero">
@@ -50,6 +119,7 @@ const Contact = () => {
           {/* FORM */}
           <form
             onSubmit={onSubmit}
+            noValidate
             className="lg:col-span-3 rounded-3xl bg-card ring-1 ring-border p-6 sm:p-8 shadow-soft"
           >
             <h2 className="text-xl font-semibold text-primary">{t("contact.formTitle")}</h2>
@@ -57,18 +127,54 @@ const Contact = () => {
             <div className="mt-6 grid sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="name">{t("contact.name")}</Label>
-                <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} placeholder={t("contact.namePh")} />
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (touched.name) validateField("name", { name: e.target.value, email, subject, message });
+                  }}
+                  onBlur={() => { setTouched((p) => ({ ...p, name: true })); validateField("name"); }}
+                  placeholder={t("contact.namePh")}
+                  aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? "name-err" : undefined}
+                  className={fieldClass("name")}
+                  maxLength={100}
+                />
+                {errors.name && <p id="name-err" className="text-xs text-destructive">{errors.name}</p>}
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="email">{t("contact.email")}</Label>
-                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (touched.email) validateField("email", { name, email: e.target.value, subject, message });
+                  }}
+                  onBlur={() => { setTouched((p) => ({ ...p, email: true })); validateField("email"); }}
+                  placeholder="you@email.com"
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "email-err" : undefined}
+                  className={fieldClass("email")}
+                  maxLength={255}
+                />
+                {errors.email && <p id="email-err" className="text-xs text-destructive">{errors.email}</p>}
               </div>
             </div>
 
             <div className="mt-4 flex flex-col gap-1.5">
               <Label htmlFor="subject">{t("contact.subject")}</Label>
-              <Select value={subject} onValueChange={setSubject}>
-                <SelectTrigger id="subject">
+              <Select
+                value={subject}
+                onValueChange={(v) => {
+                  setSubject(v);
+                  setTouched((p) => ({ ...p, subject: true }));
+                  validateField("subject", { name, email, subject: v, message });
+                }}
+              >
+                <SelectTrigger id="subject" aria-invalid={!!errors.subject} className={fieldClass("subject")}>
                   <SelectValue placeholder={t("contact.subjectPh")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -78,18 +184,32 @@ const Contact = () => {
                   <SelectItem value="report">{t("contact.subjectReport")}</SelectItem>
                 </SelectContent>
               </Select>
+              {errors.subject && <p className="text-xs text-destructive">{errors.subject}</p>}
             </div>
 
             <div className="mt-4 flex flex-col gap-1.5">
               <Label htmlFor="message">{t("contact.message")}</Label>
               <Textarea
                 id="message"
-                required
                 rows={6}
                 value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                  if (touched.message) validateField("message", { name, email, subject, message: e.target.value });
+                }}
+                onBlur={() => { setTouched((p) => ({ ...p, message: true })); validateField("message"); }}
                 placeholder={t("contact.messagePh")}
+                aria-invalid={!!errors.message}
+                aria-describedby={errors.message ? "message-err" : undefined}
+                className={fieldClass("message")}
+                maxLength={1000}
               />
+              <div className="flex justify-between text-xs">
+                {errors.message
+                  ? <p id="message-err" className="text-destructive">{errors.message}</p>
+                  : <span />}
+                <span className="text-foreground/50">{message.length}/1000</span>
+              </div>
             </div>
 
             <Button type="submit" variant="hero" size="lg" className="mt-6 w-full sm:w-auto">
