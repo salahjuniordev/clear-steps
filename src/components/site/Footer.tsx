@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { Activity, Phone } from "lucide-react";
+import { Phone } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import logo from "@/assets/afyapulse-logo.png";
 
 export const Footer = () => {
   const { t } = useLanguage();
@@ -8,11 +9,17 @@ export const Footer = () => {
     <footer className="mt-24 bg-primary text-primary-foreground">
       <div className="container-tight py-14 grid gap-10 md:grid-cols-4">
         <div className="md:col-span-2">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary-foreground/10">
-              <Activity className="h-5 w-5" />
+          <Link to="/" className="inline-flex items-center" aria-label="AfyaPulse">
+            <span className="inline-flex items-center rounded-2xl bg-primary-foreground/95 px-3 py-2 shadow-soft">
+              <img
+                src={logo}
+                alt="AfyaPulse"
+                width={180}
+                height={54}
+                className="h-10 w-auto object-contain"
+                loading="lazy"
+              />
             </span>
-            <span className="text-lg font-bold">AfyaPulse</span>
           </Link>
           <p className="mt-3 max-w-sm text-sm text-primary-foreground/70 italic">
             {t("footer.tagline")}
