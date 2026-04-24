@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Calendar, Clock, ArrowRight, BookOpen, Tag, X, Sparkles } from "lucide-react";
+import { Search, Calendar, Clock, ArrowRight, BookOpen, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -132,10 +132,16 @@ const Blog = () => {
             className="group block rounded-3xl overflow-hidden ring-1 ring-border shadow-soft hover:shadow-elevated transition-smooth bg-card"
           >
             <div className="grid lg:grid-cols-5">
-              <div className={`lg:col-span-2 aspect-[16/10] lg:aspect-auto bg-gradient-to-br ${featured.cover} relative`}>
-                <div className="absolute inset-0 grid place-items-center opacity-30">
-                  <Sparkles className="h-24 w-24 text-primary-foreground/40" aria-hidden />
-                </div>
+              <div className="lg:col-span-2 aspect-[16/10] lg:aspect-auto relative overflow-hidden bg-secondary">
+                <img
+                  src={featured.cover}
+                  alt={featured.title}
+                  loading="eager"
+                  width={1280}
+                  height={800}
+                  className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" aria-hidden />
                 <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-full bg-card/95 backdrop-blur px-3 py-1.5 text-xs font-bold text-primary shadow-soft">
                   {t("blog.featured")}
                 </span>
@@ -199,10 +205,15 @@ const Blog = () => {
                 className="group rounded-2xl bg-card ring-1 ring-border shadow-soft hover:shadow-elevated hover:-translate-y-1 transition-smooth overflow-hidden flex flex-col"
               >
                 <Link to={`/blog/${a.slug}`} className="block" aria-label={a.title}>
-                  <div className={`aspect-[16/10] bg-gradient-to-br ${a.cover} relative`}>
-                    <div className="absolute inset-0 grid place-items-center opacity-25">
-                      <BookOpen className="h-14 w-14 text-primary-foreground/40" aria-hidden />
-                    </div>
+                  <div className="aspect-[16/10] relative overflow-hidden bg-secondary">
+                    <img
+                      src={a.cover}
+                      alt={a.title}
+                      loading="lazy"
+                      width={1280}
+                      height={800}
+                      className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                     <span className={`absolute top-3 left-3 inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 backdrop-blur bg-card/90 ${categoryColor(a.category)}`}>
                       {t(`cat.${a.category}`)}
                     </span>
