@@ -27,13 +27,24 @@ import {
 } from "@/data/clinics";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSeo } from "@/hooks/useSeo";
 
 type View = "list" | "map";
 type SortBy = "default" | "distance" | "name";
 type Availability = "all" | "open" | "24h";
 
 const Annuaire = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  useSeo({
+    title: lang === "FR"
+      ? "Annuaire des cliniques · AfyaPulse"
+      : "Clinic directory · AfyaPulse",
+    description: lang === "FR"
+      ? "Trouve une clinique, hôpital ou pharmacie de garde près de toi à Douala, Yaoundé et partout au Cameroun."
+      : "Find a clinic, hospital or on-duty pharmacy near you in Douala, Yaoundé and across Cameroon.",
+    canonical: "/annuaire",
+    image: "/afyapulse-og.png",
+  });
   const [query, setQuery] = useState("");
   const [activeType, setActiveType] = useState<Clinic["type"] | "Tous">("Tous");
   const [commune, setCommune] = useState<string>("Toutes");

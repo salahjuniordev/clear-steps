@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSeo } from "@/hooks/useSeo";
 
 const Contact = () => {
   const { t, lang } = useLanguage();
@@ -24,9 +25,14 @@ const Contact = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  useEffect(() => {
-    document.title = lang === "FR" ? "Contact · AfyaPulse" : "Contact · AfyaPulse";
-  }, [lang]);
+  useSeo({
+    title: lang === "FR" ? "Contact · AfyaPulse" : "Contact us · AfyaPulse",
+    description: lang === "FR"
+      ? "Une question, un partenariat, un signalement ? Contacte l'équipe AfyaPulse à Yaoundé et Douala. Réponse sous 48h."
+      : "A question, a partnership, a report? Reach out to the AfyaPulse team in Yaoundé and Douala. Reply within 48h.",
+    canonical: "/contact",
+    image: "/afyapulse-og.png",
+  });
 
   const schema = useMemo(
     () =>

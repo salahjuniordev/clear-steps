@@ -9,6 +9,7 @@ import {
   type ArticleCategory,
 } from "@/data/articles";
 import { useLanguage, type Lang } from "@/i18n/LanguageContext";
+import { useSeo } from "@/hooks/useSeo";
 
 const categoryColor = (cat: ArticleCategory) => {
   switch (cat) {
@@ -30,14 +31,19 @@ const BlogArticle = () => {
   const { t, lang } = useLanguage();
   const article = slug ? getArticleBySlug(slug) : undefined;
 
+  useSeo({
+    title: article ? `${article.title} · AfyaPulse` : `${t("article.notFound")} · AfyaPulse`,
+    description: article ? article.excerpt : t("article.notFoundText"),
+    canonical: article ? `/blog/${article.slug}` : "/blog",
+    image: article ? article.cover : "/afyapulse-og.png",
+    type: "article",
+  });
+
   useEffect(() => {
     if (article) {
-      document.title = `${article.title} · AfyaPulse`;
       window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-    } else {
-      document.title = `${t("article.notFound")} · AfyaPulse`;
     }
-  }, [article, t]);
+  }, [article]);
 
   if (!article) {
     return (

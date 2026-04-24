@@ -4,6 +4,7 @@ import { ArrowRight, MessageCircle, Sparkles, ShieldCheck, Search, Stethoscope, 
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/hero-afyapulse.jpg";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSeo } from "@/hooks/useSeo";
 
 const partners = ["OMS", "UNICEF", "MSF", "Ministère Santé", "Croix-Rouge", "Africa CDC", "USAID"];
 
@@ -52,7 +53,17 @@ const Counter = ({ target, suffix, label, Icon }: { target: number; suffix: stri
 };
 
 const Index = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  useSeo({
+    title: lang === "FR"
+      ? "AfyaPulse — Comprendre pour mieux se soigner"
+      : "AfyaPulse — Understand to better care",
+    description: lang === "FR"
+      ? "Plateforme santé pour le Cameroun et l'Afrique francophone : maladies, quiz, annuaire de cliniques et assistant AI bilingue FR/EN."
+      : "Health platform for Cameroon and French-speaking Africa: diseases, quiz, clinic directory and bilingual FR/EN AI assistant.",
+    canonical: "/",
+    image: "/afyapulse-og.png",
+  });
 
   const counters = [
     { value: 25, suffix: "+", label: t("index.counter1"), icon: BookOpen },

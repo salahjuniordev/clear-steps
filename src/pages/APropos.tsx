@@ -1,15 +1,19 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Heart, Eye, ShieldCheck, Globe2, Users, Sparkles, ArrowRight, Stethoscope, Code2, Newspaper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSeo } from "@/hooks/useSeo";
 
 const APropos = () => {
   const { t, lang } = useLanguage();
-
-  useEffect(() => {
-    document.title = lang === "FR" ? "À propos · AfyaPulse" : "About · AfyaPulse";
-  }, [lang]);
+  useSeo({
+    title: lang === "FR" ? "À propos · AfyaPulse" : "About · AfyaPulse",
+    description: lang === "FR"
+      ? "AfyaPulse milite pour une santé claire et accessible au Cameroun. Découvre notre mission, notre équipe et nos partenaires."
+      : "AfyaPulse advocates for clear, accessible healthcare in Cameroon. Meet our mission, team and partners.",
+    canonical: "/a-propos",
+    image: "/afyapulse-og.png",
+  });
 
   const values = [
     { icon: ShieldCheck, title: t("about.value1Title"), text: t("about.value1") },

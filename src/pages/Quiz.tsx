@@ -19,6 +19,7 @@ import jsPDF from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
+import { useSeo } from "@/hooks/useSeo";
 
 type Profile = "Adulte" | "Enfant" | "Femme enceinte" | "Personne âgée";
 
@@ -208,6 +209,12 @@ const exportPdf = (profile: Profile, region: string, picked: string[], rec: Reco
 };
 
 const Quiz = () => {
+  useSeo({
+    title: "Quiz santé en 2 minutes · AfyaPulse",
+    description: "Réponds à quelques questions et reçois une orientation santé personnalisée. Évaluation gratuite, anonyme et bilingue FR/EN.",
+    canonical: "/quiz",
+    image: "/afyapulse-og.png",
+  });
   const [step, setStep] = useState(0);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [region, setRegion] = useState<string>("");
