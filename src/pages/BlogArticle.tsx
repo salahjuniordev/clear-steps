@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock, Share2, ArrowRight, BookOpen, AlertTriangle, MapPin } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Share2, ArrowRight, AlertTriangle, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import {
