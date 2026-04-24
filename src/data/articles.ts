@@ -1,3 +1,12 @@
+import paludismeImg from "@/assets/blog/paludisme-saison-pluies.jpg";
+import choleraImg from "@/assets/blog/cholera-douala.jpg";
+import diabeteImg from "@/assets/blog/alimentation-diabete.jpg";
+import vaccinationImg from "@/assets/blog/vaccination-rougeole.jpg";
+import marieImg from "@/assets/blog/temoignage-marie.jpg";
+import tuberculoseImg from "@/assets/blog/tuberculose-depistage.jpg";
+import hypertensionImg from "@/assets/blog/hypertension.jpg";
+import vihImg from "@/assets/blog/vih-prep.jpg";
+
 export type ArticleCategory = "Prévention" | "Alerte" | "Nutrition" | "Témoignage" | "Recherche";
 
 export interface Article {
@@ -9,7 +18,7 @@ export interface Article {
   authorRole: string;
   publishedAt: string; // ISO date
   readMinutes: number;
-  cover: string; // gradient class for hero placeholder
+  cover: string; // imported image URL
   tags: string[];
   region?: string;
   featured?: boolean;
@@ -27,7 +36,7 @@ export const articles: Article[] = [
     authorRole: "Épidémiologiste · Yaoundé",
     publishedAt: "2026-04-12",
     readMinutes: 6,
-    cover: "from-warning/30 via-warning/10 to-primary/20",
+    cover: paludismeImg,
     tags: ["paludisme", "moustiquaire", "saison-pluies"],
     region: "Cameroun",
     featured: true,
@@ -58,7 +67,7 @@ export const articles: Article[] = [
     authorRole: "Journaliste santé · Douala",
     publishedAt: "2026-04-08",
     readMinutes: 4,
-    cover: "from-info/30 via-info/10 to-primary/20",
+    cover: choleraImg,
     tags: ["choléra", "hygiène", "eau-potable"],
     region: "Littoral",
     content: [
@@ -83,7 +92,7 @@ export const articles: Article[] = [
     authorRole: "Nutritionniste · Yaoundé",
     publishedAt: "2026-04-02",
     readMinutes: 7,
-    cover: "from-success/30 via-success/10 to-primary/20",
+    cover: diabeteImg,
     tags: ["diabète", "nutrition", "ndolè", "manioc"],
     featured: true,
     content: [
@@ -110,7 +119,7 @@ export const articles: Article[] = [
     authorRole: "Pédiatre · CHU Yaoundé",
     publishedAt: "2026-03-28",
     readMinutes: 3,
-    cover: "from-primary/30 via-primary-glow/10 to-secondary",
+    cover: vaccinationImg,
     tags: ["vaccination", "rougeole", "enfants"],
     content: [
       { type: "p", text: "La rougeole tue encore au Cameroun. La campagne d'avril vise à vacciner gratuitement 4 millions d'enfants à travers les 10 régions." },
@@ -134,7 +143,7 @@ export const articles: Article[] = [
     authorRole: "",
     publishedAt: "2026-03-20",
     readMinutes: 8,
-    cover: "from-accent/30 via-accent/10 to-secondary",
+    cover: marieImg,
     tags: ["diabète", "témoignage", "lifestyle"],
     content: [
       { type: "p", text: "« Quand le médecin m'a annoncé que ma glycémie était à 2,8 g/L, j'ai cru que c'était la fin. J'avais 38 ans, deux enfants, un travail. Le diabète, c'était pour les vieux. »" },
@@ -155,7 +164,7 @@ export const articles: Article[] = [
     authorRole: "Épidémiologiste · Yaoundé",
     publishedAt: "2026-03-15",
     readMinutes: 5,
-    cover: "from-info/30 via-info/10 to-secondary",
+    cover: tuberculoseImg,
     tags: ["tuberculose", "dépistage", "rural"],
     content: [
       { type: "p", text: "La tuberculose reste la première cause de mortalité par maladie infectieuse au monde. Au Cameroun, près de 50 000 nouveaux cas par an, dont la moitié non diagnostiqués." },
@@ -179,7 +188,7 @@ export const articles: Article[] = [
     authorRole: "Cardiologue · Douala",
     publishedAt: "2026-03-10",
     readMinutes: 6,
-    cover: "from-destructive/30 via-warning/10 to-secondary",
+    cover: hypertensionImg,
     tags: ["hypertension", "AVC", "cardio"],
     content: [
       { type: "p", text: "On l'ignore souvent jusqu'à l'AVC ou l'infarctus. Pourtant, 1 adulte camerounais sur 3 vit avec une tension élevée sans le savoir." },
@@ -203,7 +212,7 @@ export const articles: Article[] = [
     authorRole: "Santé publique",
     publishedAt: "2026-03-05",
     readMinutes: 5,
-    cover: "from-primary-glow/30 via-success/10 to-secondary",
+    cover: vihImg,
     tags: ["VIH", "PrEP", "prévention"],
     content: [
       { type: "p", text: "La PrEP (prophylaxie pré-exposition) est un comprimé quotidien qui empêche le VIH de s'installer dans l'organisme en cas d'exposition. Efficacité : 99 % quand elle est bien prise." },
