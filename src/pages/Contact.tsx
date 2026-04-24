@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Mail, MessageCircle, MapPin, Phone, Send, AlertTriangle } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
