@@ -1,8 +1,9 @@
 import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
-import { Activity, Menu, X, Languages } from "lucide-react";
+import { Menu, X, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
+import logo from "@/assets/afyapulse-logo.png";
 
 export const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -20,13 +21,14 @@ export const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <nav className="container-tight flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 group">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary-gradient text-primary-foreground shadow-soft transition-smooth group-hover:scale-105">
-            <Activity className="h-5 w-5" strokeWidth={2.4} />
-          </span>
-          <span className="text-lg font-bold tracking-tight text-primary">
-            Afya<span className="text-primary-glow">Pulse</span>
-          </span>
+        <Link to="/" className="flex items-center gap-2 group" aria-label="AfyaPulse">
+          <img
+            src={logo}
+            alt="AfyaPulse"
+            width={160}
+            height={48}
+            className="h-9 sm:h-10 w-auto object-contain transition-smooth group-hover:scale-105"
+          />
         </Link>
 
         <ul className="hidden lg:flex items-center gap-1">
