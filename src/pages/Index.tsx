@@ -4,6 +4,7 @@ import { ArrowRight, MessageCircle, Sparkles, ShieldCheck, Search, Stethoscope, 
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/hero-afyapulse.jpg";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSeo } from "@/hooks/useSeo";
 
 const partners = ["OMS", "UNICEF", "MSF", "Ministère Santé", "Croix-Rouge", "Africa CDC", "USAID"];
 

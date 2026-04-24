@@ -101,8 +101,14 @@ const Chat = () => {
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const interimBaseRef = useRef<string>("");
 
+  useSeo({
+    title: "Assistant santé AI · AfyaPulse",
+    description: "Pose tes questions santé à l'assistant AfyaPulse, disponible 24/7 en français et anglais. Conseils, prévention et orientation rapide.",
+    canonical: "/chat",
+    image: "/afyapulse-og.png",
+  });
+
   useEffect(() => {
-    document.title = "Chatbot santé AI · AfyaPulse";
     localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);

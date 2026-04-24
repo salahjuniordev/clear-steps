@@ -11,9 +11,20 @@ import {
   type DiseaseCategory,
 } from "@/data/diseases";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSeo } from "@/hooks/useSeo";
 
 const Maladies = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  useSeo({
+    title: lang === "FR"
+      ? "Bibliothèque des maladies · AfyaPulse"
+      : "Disease library · AfyaPulse",
+    description: lang === "FR"
+      ? "Fiches santé claires : symptômes, prévention, traitement et urgences pour les maladies les plus fréquentes au Cameroun."
+      : "Clear health fact sheets: symptoms, prevention, treatment and red flags for the most common diseases in Cameroon.",
+    canonical: "/maladies",
+    image: "/afyapulse-og.png",
+  });
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<DiseaseCategory | "Toutes">("Toutes");
 
