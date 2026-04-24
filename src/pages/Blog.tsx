@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Calendar, Clock, ArrowRight, BookOpen, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { articles, ARTICLE_CATEGORIES, formatDate, type ArticleCategory } from "@/data/articles";
 import { useLanguage, type Lang } from "@/i18n/LanguageContext";
+import { useSeo } from "@/hooks/useSeo";
 
 const categoryColor = (cat: ArticleCategory) => {
   switch (cat) {
@@ -28,9 +29,14 @@ const Blog = () => {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<ArticleCategory | "Toutes">("Toutes");
 
-  useEffect(() => {
-    document.title = lang === "FR" ? "Blog santé · AfyaPulse" : "Health blog · AfyaPulse";
-  }, [lang]);
+  useSeo({
+    title: lang === "FR" ? "Blog santé · AfyaPulse" : "Health blog · AfyaPulse",
+    description: lang === "FR"
+      ? "Articles santé pensés pour le Cameroun : prévention, alertes, nutrition, témoignages et recherche, en français et en anglais."
+      : "Health articles built for Cameroon: prevention, alerts, nutrition, testimonies and research, in English and French.",
+    canonical: "/blog",
+    image: "/afyapulse-og.png",
+  });
 
   const featured = useMemo(() => articles.find((a) => a.featured), []);
 

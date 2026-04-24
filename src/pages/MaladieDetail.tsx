@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { diseases, categoryStyles, severityStyles } from "@/data/diseases";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSeo } from "@/hooks/useSeo";
 
 const toneStyles = {
   warning: "bg-warning/10 text-warning ring-warning/20",
@@ -28,12 +29,19 @@ const MaladieDetail = () => {
   const disease = diseases.find((d) => d.slug === slug);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    if (disease) document.title = `${disease.name} — AfyaPulse`;
-    return () => {
-      document.title = lang === "FR" ? "AfyaPulse — Comprendre pour mieux se soigner" : "AfyaPulse — Understand to better care";
-    };
-  }, [disease, lang]);
+  useSeo({
+    title: disease
+      ? `${disease.name} · AfyaPulse`
+      : (lang === "FR" ? "Maladie introuvable · AfyaPulse" : "Disease not found · AfyaPulse"),
+    description: disease
+      ? disease.shortDesc
+      : (lang === "FR"
+          ? "Cette fiche n'existe plus. Explore notre bibliothèque des maladies."
+          : "This page is no longer available. Browse our disease library."),
+    canonical: disease ? `/maladies/${disease.slug}` : "/maladies",
+    image: "/afyapulse-og.png",
+    type: "article",
+  });
 
   if (!disease) {
     return (
