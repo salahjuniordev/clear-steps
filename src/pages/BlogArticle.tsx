@@ -114,10 +114,16 @@ const BlogArticle = () => {
           </div>
         </header>
 
-        <div className={`mt-10 max-w-4xl mx-auto aspect-[21/9] rounded-3xl bg-gradient-to-br ${article.cover} relative overflow-hidden ring-1 ring-border shadow-elevated`}>
-          <div className="absolute inset-0 grid place-items-center opacity-25">
-            <BookOpen className="h-32 w-32 text-primary-foreground/40" aria-hidden />
-          </div>
+        <div className="mt-10 max-w-4xl mx-auto aspect-[21/9] rounded-3xl relative overflow-hidden ring-1 ring-border shadow-elevated bg-secondary">
+          <img
+            src={article.cover}
+            alt={article.title}
+            loading="eager"
+            width={1280}
+            height={800}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent" aria-hidden />
         </div>
 
         <div className="mt-8 max-w-2xl mx-auto flex items-center justify-between gap-4 flex-wrap">
@@ -191,7 +197,15 @@ const BlogArticle = () => {
                   to={`/blog/${a.slug}`}
                   className="group rounded-2xl bg-card ring-1 ring-border shadow-soft hover:shadow-elevated hover:-translate-y-1 transition-smooth overflow-hidden block"
                 >
-                  <div className={`aspect-[16/10] bg-gradient-to-br ${a.cover} relative`}>
+                  <div className="aspect-[16/10] relative overflow-hidden bg-secondary">
+                    <img
+                      src={a.cover}
+                      alt={a.title}
+                      loading="lazy"
+                      width={1280}
+                      height={800}
+                      className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                     <span className={`absolute top-3 left-3 inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 backdrop-blur bg-card/90 ${categoryColor(a.category)}`}>
                       {t(`cat.${a.category}`)}
                     </span>
