@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
+import { useSeo } from "@/hooks/useSeo";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
